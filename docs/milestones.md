@@ -12,6 +12,9 @@ Piano, fonti e campione verificato: [Catalogo cucine 2026](kitchen-catalog-2026.
   doppio controllo numerico, regole percentuali e verifiche visive registrate.
   Risultati e limiti: [importazione verificata](kitchen-catalog-import.md).
 - [ ] Importazione strutturata e verifica delle sezioni cucina.
+- [x] Biblioteca integrata nell'app: import privato, categorie, ricerca, dettagli e note.
+- [x] Preferiti ed elenchi per progetto con quantità, note e snapshot conservati.
+- [x] Catalogo ed elenchi inclusi nel backup; apertura reale della copia verificata.
 - [ ] Modello dati per varianti, gruppi, punti, unità e note tecniche.
 - [ ] Composizione e collaudo di una cucina con articoli reali verificati.
 - [ ] Calcolo dei costi (successivo): punti / 1,46, quantità e supplementi.

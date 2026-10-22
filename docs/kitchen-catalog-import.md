@@ -5,6 +5,8 @@
 Il manuale fornito dallo studio è la fonte primaria: non viene modificato e non
 viene caricato nel repository o incorporato nell'installer. La biblioteca
 generata permette di cercare codici, sigle, punti e note senza servizi esterni.
+La biblioteca è integrata nel programma tramite import privato dalla versione
+0.4.0; [istruzioni e architettura](kitchen-in-app.md).
 Non è ancora un insieme di prodotti approvati inseribili nella pianta: il modello
 del catalogo attuale non rappresenta matrici di prezzo, regole, unità e ingombri
 configurati. Non importare queste informazioni nel vecchio CSV perdendo campi.
@@ -92,6 +94,7 @@ Questo non aggiunge un server al pacchetto distribuito.
 ## Passaggio successivo
 
 Modellare unità, maggiorazioni, condizioni, misure e finiture con provenienza;
-approvare sezioni progressive e integrare la consultazione nell'applicazione
-Windows. Solo dopo questi controlli introdurre il calcolo richiesto dallo studio
+approvare sezioni progressive e abilitare la composizione di mobili reali.
+La consultazione è già integrata nell'applicazione Windows. Solo dopo questi
+controlli introdurre il calcolo richiesto dallo studio
 (punti / 1,46 e regole specifiche per lunghezze e lavorazioni).

@@ -13,6 +13,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy import create_engine, text
 from backend.catalog import register_catalog, validate_scene_catalog
+from backend.kitchen import register_kitchen
 
 engine = create_engine(os.getenv("DATABASE_URL", "sqlite:///./studio.db"))
 app = FastAPI(title="Albertelli Design Studio — DEMO", version="0.2.0")
@@ -504,3 +505,4 @@ def restore(pid: str, revision: int, data: Restore, u=Depends(user)):
 
 
 register_catalog(app, engine, user)
+register_kitchen(app, engine, user)

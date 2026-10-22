@@ -66,3 +66,13 @@ Il backup ferma i servizi e copia insieme DB, chiave e campioni con manifest.
 La compilazione dell'installer richiede Windows; il cloud Linux verifica i servizi,
 la finestra Electron in modalità headless e la compatibilità del flusso web.
 Vedi [windows-desktop.md](windows-desktop.md) per limiti, build e collaudo.
+
+## Biblioteca cucina integrata (0.4.0)
+
+`backend/kitchen.py` aggiunge importazione del pacchetto privato verificato,
+indice locale SQLite FTS5, categorie e ricerca, provenienza e pagine della fonte.
+Le nuove tabelle versione 3 conservano riferimento al catalogo ed elenchi per
+proprietario/progetto, con revisioni e snapshot. L'indice è sotto ASSET_DIR,
+coperto dal backup. Nessuna modifica a scene o prodotti precedenti.
+`frontend/app/kitchen.tsx` integra consultazione, preferiti e articoli del progetto.
+Dettagli, API e limiti in [kitchen-in-app.md](kitchen-in-app.md).

@@ -34,7 +34,8 @@ async function proxy(
   try {
     let body: Uint8Array | undefined;
     if (!["GET", "HEAD"].includes(request.method) && request.body) {
-      const limit = path.includes("swatch") ? 2 * 1024 * 1024 : 5 * 1024 * 1024;
+      const libraryImport = path.length === 2 && path[0] === "kitchen" && path[1] === "import";
+      const limit = libraryImport ? 20 * 1024 * 1024 : path.includes("swatch") ? 2 * 1024 * 1024 : 5 * 1024 * 1024;
       const reader = request.body.getReader();
       const chunks: Uint8Array[] = [];
       let total = 0;
@@ -59,13 +60,13 @@ async function proxy(
       }
     }
     const response = await fetch(
-      `${process.env.API_URL || "http://127.0.0.1:8000"}/api/${path.map(encodeURIComponent).join("/")}`,
+      `${process.env.API_URL || "http://127.0.0.1:8000"}/api/${path.map(encodeURIComponent).join("/")}${request.nextUrl.search}`,
       {
         method: request.method,
         headers,
         body: body as BodyInit | undefined,
         cache: "no-store",
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(path[0] === "kitchen" && path[1] === "import" ? 60000 : 15000),
       },
     );
     const outgoing = new Headers({
@@ -92,4 +93,4 @@ async function proxy(
     );
   }
 }
-export { proxy as GET, proxy as POST, proxy as PUT };
+export { proxy as GET, proxy as POST, proxy as PUT, proxy as DELETE };

@@ -1,7 +1,13 @@
 # Albertelli Design Studio AI — DEMO
 
-Prototipo Fasi 0–1 con catalogo della Fase 2, interfaccia italiana, cucina 2D e moodboard. Nessuna chiamata
-IA, nessun catalogo commerciale: tutti gli arredi e i materiali sono DEMO.
+Studio locale con interfaccia italiana, cucina 2D, moodboard e biblioteca privata
+**Albertelli Kitchen 2026**. La biblioteca comprende codici, varianti, punti e note
+del manuale verificato, caricabili dal pacchetto privato dello studio.
+Gli arredi geometrici e le proposte moodboard restano DEMO; il catalogo non abilita
+ancora inserimento automatico dei mobili reali o calcolo dei costi.
+
+Uso del catalogo, preferiti, articoli per progetto e backup:
+[Albertelli Kitchen nel programma](docs/kitchen-in-app.md).
 
 ## Struttura
 

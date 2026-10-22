@@ -216,6 +216,31 @@ test(
         },
       );
       assert.equal(upload.status, 200, await upload.text());
+      // The genuine catalog stays private and is supplied only for local
+      // acceptance testing. Public CI never receives the studio's data.
+      let kitchenPick;
+      if (process.env.STUDIO_KITCHEN_PACKAGE) {
+        const packageBytes = await fs.readFile(process.env.STUDIO_KITCHEN_PACKAGE);
+        for (const commit of [false, true]) {
+          const imported = await fetch(runtime.webUrl + "/api/kitchen/import?commit=" + commit, {
+            method: "POST", headers: { "x-studio-desktop-ui": runtime.uiToken, Cookie: cookie,
+              "Content-Type": "application/zip" }, body: packageBytes,
+          });
+          assert.equal(imported.status, 200, await imported.clone().text());
+          assert.equal((await imported.json()).articleOccurrences, 8870);
+        }
+        const found = await (await req(runtime, "/api/kitchen/items?q=21008", { cookie })).json();
+        assert.equal(found.items[0].code, "21008");
+        assert.equal(found.items[0].cells[0].points, "1006");
+        assert.equal(found.items[0].cells[7].available, false);
+        const sourcePage = await (await req(runtime, "/api/kitchen/pages/295", { cookie })).json();
+        assert.match(sourcePage.display_text, /100 mm/);
+        assert.doesNotMatch(sourcePage.display_text, /nobilia/i);
+        kitchenPick = await (await req(runtime, "/api/kitchen/picks", { cookie,
+          method: "POST", data: { occurrenceId: found.items[0].id, projectId: project.id } })).json();
+        await req(runtime, "/api/kitchen/picks/" + kitchenPick.id, { cookie, method: "PUT",
+          data: { expectedRevision: 1, quantity: 3, note: "Verifica finitura" } });
+      }
       if (process.env.DESKTOP_BROWSER_TEST === "1") {
         const { chromium } = require("../../frontend/node_modules/playwright");
         const browser = await chromium.launch({
@@ -266,6 +291,22 @@ test(
             .getByRole("button", { name: "Rientra nello studio", exact: false })
             .click();
           await page.getByRole("button", { name: /Cucina desktop/ }).waitFor();
+          await page.locator(".sidebar").getByRole("button", { name: "Albertelli Kitchen", exact: true }).click();
+          if (process.env.STUDIO_KITCHEN_PACKAGE) {
+            await page.getByLabel("Pacchetto catalogo Albertelli Kitchen").setInputFiles(process.env.STUDIO_KITCHEN_PACKAGE);
+            await page.getByRole("button", { name: "Conferma caricamento" }).click();
+            await page.getByRole("status").filter({ hasText: "Catalogo Albertelli Kitchen caricato" }).waitFor();
+            await page.getByLabel("Cerca nel catalogo").fill("21008");
+            await page.getByRole("button", { name: /CODICE 21008/ }).first().click();
+            await page.locator(".k-detail table").waitFor();
+            assert.match(await page.locator(".k-detail table").innerText(), /1\.?006/);
+            await page.getByRole("button", { name: "Salva nei preferiti", exact: true }).click();
+            await page.getByRole("status").filter({ hasText: "Articolo salvato nei preferiti" }).waitFor();
+            await page.getByRole("button", { name: "Preferiti", exact: true }).click();
+            await page.locator(".k-pick").first().waitFor();
+          } else {
+            await page.getByRole("heading", { name: "Tutto il catalogo cucina in un solo spazio." }).waitFor();
+          }
           await fs.mkdir(path.resolve(__dirname, "../test-results"), {
             recursive: true,
           });
@@ -289,6 +330,10 @@ test(
         await req(runtime, "/api/projects/" + project.id, { cookie: c })
       ).json();
       assert.deepEqual(saved.scene, scene);
+      if (kitchenPick) {
+        const state = await (await req(runtime, "/api/kitchen/status", { cookie: c })).json();
+        assert.equal(state.articleOccurrences, 8870);
+      }
       await runtime.stop();
       restored = new Runtime({
         resources,
@@ -303,6 +348,14 @@ test(
         await req(restored, "/api/projects/" + project.id, { cookie: c })
       ).json();
       assert.deepEqual(saved.scene, scene);
+      if (kitchenPick) {
+        const choices = await (await req(restored, "/api/kitchen/picks?projectId=" + project.id, { cookie: c })).json();
+        assert.equal(choices[0].quantity, 3);
+        assert.equal(choices[0].note, "Verifica finitura");
+        assert.equal(choices[0].snapshot.cells[0].points, "1006");
+        const found = await (await req(restored, "/api/kitchen/items?q=21008", { cookie: c })).json();
+        assert.equal(found.items[0].code, "21008");
+      }
       const swatch = await req(restored, `/api/catalog/${finish.id}/swatch`, {
         cookie: c,
       });

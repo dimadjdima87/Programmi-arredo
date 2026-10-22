@@ -20,12 +20,13 @@ guida qualità (92 pagine). Il testo del manuale è stato estratto integralmente
 Questo non costituisce un'importazione strutturata o una validazione completa.
 Confrontate visivamente le pagine PDF 200 e 295 con il testo estratto.
 
-Non ci sono ancora articoli di questo manuale precaricati nell'applicazione.
-È ora disponibile una biblioteca di riferimento separata con 8.870 occorrenze,
-901 pagine cucina ricercabili e audit riproducibile; vedere
+La biblioteca è ora integrata nel programma dalla versione 0.4.0: il pacchetto
+privato carica 8.870 occorrenze e 901 pagine cucina ricercabili, con matrici e note
+conservate. Include preferiti ed elenchi degli articoli per progetto.
+Vedere [utilizzo nel programma](kitchen-in-app.md) e
 [preparazione e controlli](kitchen-catalog-import.md).
-Il catalogo attuale non ha campi per matrici di punti, unità di conteggio e
-vincoli commerciali: non ridurre questi dati al solo CSV prodotti esistente.
+Non ridurre questi dati al solo CSV prodotti precedente, che non ne rappresenta
+unità e regole. Il posizionamento in pianta richiede ancora ingombri configurati.
 
 ## Campione verificato
 

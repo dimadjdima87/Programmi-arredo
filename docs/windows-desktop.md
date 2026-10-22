@@ -1,4 +1,4 @@
-# Applicazione desktop Windows — confezionamento 0.3.1
+# Applicazione desktop Windows — confezionamento 0.4.0
 
 ## Per chi userà il programma
 
@@ -11,6 +11,15 @@ né pagare un hosting. È comunque necessario collaudare l'installer su Windows.
 Le funzioni locali comprendono pianta 2D, cataloghi, campioni, versioni, moodboard
 DEMO e export. Le proposte IA restano il mock dichiarato: non richiedono rete.
 Integrazioni IA reali, sincronizzazione e progetti condivisi non sono inclusi.
+
+### Catalogo Albertelli Kitchen (0.4.0)
+
+Dopo l'aggiornamento aprire **Albertelli Kitchen → Carica catalogo 2026**, scegliere
+il pacchetto ZIP privato già preparato e confermare il riepilogo. Basta un solo
+caricamento: ricerca, punti, note, preferiti e articoli del progetto funzionano
+offline e rientrano nei backup. Il pacchetto è consegnato separatamente dal
+programma, per mantenere interno il materiale dello studio.
+[Istruzioni complete](kitchen-in-app.md).
 
 ### Accesso e uscita
 

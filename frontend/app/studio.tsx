@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Stage, Layer, Line, Rect, Text, Group, Circle } from "react-konva";
 import type Konva from "konva";
 import Catalog, { type Entry } from "./catalog";
+import Kitchen from "./kitchen";
 import {
   demo,
   finishOnly,
@@ -124,7 +125,7 @@ export default function Studio() {
     if (!canLeave()) return;
     await run(async () => {
       accept(await api("/projects/" + id));
-      if (tab === "catalog") setTab("plan");
+      if (tab === "catalog" || tab === "kitchen") setTab("plan");
       setVersions(await api("/projects/" + id + "/versions"));
       setStatus("Progetto ricaricato dal database");
     });
@@ -436,7 +437,7 @@ export default function Studio() {
         <div className="brand">
           ALBERTELLI<span>DESIGN STUDIO</span>
         </div>
-        <div className="demo-badge">WORKSPACE DEMO</div>
+        <div className="demo-badge">{tab === "kitchen" ? "CATALOGO DELLO STUDIO" : "WORKSPACE DEMO"}</div>
         <button
           className="new"
           onClick={() => {
@@ -453,6 +454,9 @@ export default function Studio() {
         </button>
         <button className="new" onClick={() => setTab("catalog")}>
           Catalogo e materiali
+        </button>
+        <button className={"new" + (tab === "kitchen" ? " active" : "")} onClick={() => setTab("kitchen")}>
+          Albertelli Kitchen
         </button>
         <p className="eyebrow">I TUOI PROGETTI</p>
         <nav>
@@ -521,9 +525,11 @@ export default function Studio() {
         </header>
         <div role="status" className="status">
           {status ||
-            "Dati DEMO · misure in millimetri · nessun servizio IA esterno"}
+            (tab === "kitchen" ? "Albertelli Kitchen · catalogo e appunti privati dello studio" : "Dati DEMO · misure in millimetri · nessun servizio IA esterno")}
         </div>
-        {tab === "catalog" ? (
+        {tab === "kitchen" ? (
+          <Kitchen projectId={p?.id || ""} projectTitle={p?.title || ""} onBack={() => setTab("plan")} />
+        ) : tab === "catalog" ? (
           <>
             <button className="catalog-back" onClick={() => setTab("plan")}>
               ← {p ? "Torna al progetto" : "Torna allo studio"}
@@ -579,6 +585,7 @@ export default function Studio() {
                 ["mood", "Moodboard"],
                 ["project", "Brief e versioni"],
                 ["catalog", "Catalogo"],
+                ["kitchen", "Albertelli Kitchen"],
               ].map(([key, label]) => (
                 <button
                   key={key}

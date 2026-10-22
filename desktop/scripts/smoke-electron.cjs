@@ -46,6 +46,12 @@ const path = require("node:path");
       .waitFor();
     if (await window.evaluate(() => typeof require !== "undefined"))
       throw new Error("Node esposto nel renderer");
+    await window.locator(".sidebar").getByRole("button", { name: "Albertelli Kitchen", exact: true }).click();
+    await window.getByRole("heading", { name: "Albertelli Kitchen", exact: true }).waitFor();
+    await window.getByLabel("Pacchetto catalogo Albertelli Kitchen").setInputFiles({
+      name: "catalogo-non-valido.zip", mimeType: "application/zip", buffer: Buffer.from("not a catalog"),
+    });
+    await window.locator(".k-message").filter({ hasText: "Pacchetto di catalogo non valido" }).waitFor();
     const fs = require("node:fs/promises");
     await fs.mkdir(path.resolve(__dirname, "../test-results"), {
       recursive: true,
