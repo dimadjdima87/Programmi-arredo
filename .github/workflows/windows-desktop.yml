@@ -39,8 +39,10 @@ jobs:
           DESKTOP_BROWSER_TEST: '1'
         run: npm --prefix desktop test
       - name: Test unpackaged Electron window
+        timeout-minutes: 3
         run: node desktop/scripts/smoke-electron.cjs
       - name: Install and test Windows application
+        timeout-minutes: 4
         shell: pwsh
         run: |
           $installer = Get-ChildItem desktop/release/*Setup*.exe | Select-Object -First 1
