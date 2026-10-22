@@ -37,5 +37,6 @@ con proxy esplicitamente distinguibili dai modelli accurati di produttore.
 - [x] Protezione delle porte locali e accesso automatico solo desktop.
 - [x] Backup dei dati salvati e test di apertura della copia recuperata.
 - [x] Script Windows e workflow di build/test/installazione NSIS predisposti.
-- [ ] Build e collaudo effettivi dell'installer su Windows x64.
-- [ ] Firma editore e consegna dell'installer agli utenti.
+- [x] Build e collaudo effettivi dell'installer su Windows x64 (GitHub Actions, 22 ottobre 2026).
+- [x] Installer disponibile come artifact GitHub scaricabile.
+- [ ] Firma editore per la distribuzione.

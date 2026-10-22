@@ -98,3 +98,25 @@ predisposto non passa quei flag.
 NSIS su Windows, firma editore, SmartScreen, aggiornamento/disinstallazione.
 Il workflow è predisposto ma non è stato avviato né è stata pubblicata una release.
 Il pacchetto Linux non viene presentato come programma installabile Windows.
+
+## Build e collaudo Windows effettivi — 22 ottobre 2026
+
+Le verifiche Windows precedentemente indicate come non eseguite sono ora passate:
+
+- Run: https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39757995309
+- Commit applicativo: 5a171821bacf841a4666ed114d8ea19a80446af8.
+- Stato finale GitHub: **Success**, durata 4 minuti e 41 secondi.
+- Build nativa Python, Next standalone e installer NSIS x64: passata.
+- Test del payload con browser, backup e recupero: passati.
+- Finestra Electron prima dell'installazione: passata.
+- Installazione silenziosa Windows e avvio/salvataggio del programma installato:
+  passati.
+- Artifact caricato: `Albertelli-Design-Studio-Windows-x64`, 134 MB,
+  ID 12417356212, contenente installer e SHA256.txt.
+- Digest SHA-256 dell'artifact pubblicato da GitHub:
+  `1e82b13723819fba9d4ab9376e5bf3e1d3ee474193da46422f0fc85d0c9a57bd`.
+
+Esito osservato nelle pagine ufficiali GitHub del run e del job. Il warning
+Node 20 riguarda le versioni delle action, forzate da GitHub a Node 24; non ha
+fatto fallire build o test. Nessuna firma editore e nessuna GitHub Release creata:
+l'installer è distribuito come artifact del workflow, con accesso GitHub.

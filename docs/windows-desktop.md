@@ -76,17 +76,22 @@ test runtime e crea un installer NSIS x64 in `desktop/release`.
 L'app non può essere convertita semplicemente rinominando un eseguibile Linux:
 il componente Python deve essere costruito su Windows.
 
-In alternativa eseguire il workflow manuale **Windows desktop installer** su
-GitHub Actions, dopo aver reso disponibili i file nel repository GitHub. È
+Il workflow **Windows desktop installer** su GitHub Actions parte automaticamente
+al push su main dei file applicativi; resta disponibile anche l’avvio manuale. È
 predisposto per build nativa, test runtime/browser, finestra Electron, installazione
 silenziosa di prova e salvataggio del programma installato. Solo se tutti i
 passaggi riescono carica l'artifact `Albertelli-Design-Studio-Windows-x64`, con
 installer e checksum SHA-256. Il workflow non pubblica una release automaticamente.
 
-**Non c'è ancora un installer Windows generato e collaudato in questa sessione.**
-La macchina cloud corrente è Linux e il workflow Windows non è stato eseguito.
-Il nome previsto è `Albertelli-Design-Studio-Setup-0.3.0-x64.exe`.
-Non dichiarare l'app pronta alla distribuzione finché il collaudo Windows non passa.
+**Installer Windows generato e collaudato su GitHub Actions il 22 ottobre 2026.**
+La build nativa, i test runtime/browser, la finestra Electron e l'installazione
+con avvio del programma installato sono riusciti.
+
+[Build Windows riuscita e download](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39757995309#artifacts).
+Accedere a GitHub, scaricare l'artifact `Albertelli-Design-Studio-Windows-x64`
+(134 MB), estrarre lo ZIP e avviare `Albertelli-Design-Studio-Setup-0.3.0-x64.exe`.
+L'artifact contiene anche SHA256.txt. È un prototipo; la firma editore non è
+ancora configurata.
 
 ## Firma e distribuzione
 
