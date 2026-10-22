@@ -8,6 +8,8 @@ Check-Exit
 $Python = Join-Path (Get-Location) '.venv/Scripts/python.exe'
 & $Python -m pip install -r backend/requirements.lock -r desktop/requirements-build.txt
 Check-Exit
+& $Python -m pytest backend/tests -q
+Check-Exit
 npm.cmd --prefix frontend ci
 Check-Exit
 npm.cmd --prefix desktop ci

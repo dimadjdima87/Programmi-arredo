@@ -1,6 +1,6 @@
 """Private kitchen reference library, indexed locally without executing uploads."""
 
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 import hashlib
 import io
 import json
@@ -131,7 +131,7 @@ def summary(manifest):
 
 
 def create_index(path, data):
-    with sqlite3.connect(path) as db:
+    with closing(sqlite3.connect(path)) as db, db:
         db.executescript("""
           CREATE TABLE pages(page INTEGER PRIMARY KEY, category TEXT NOT NULL, reference TEXT,
             section TEXT NOT NULL, kitchen INTEGER NOT NULL, display_text TEXT NOT NULL, source_text TEXT NOT NULL);
@@ -249,7 +249,7 @@ def register_kitchen(app, engine, user):
             return report
         if current and current["dataset_hash"] == digest:
             try:
-                with sqlite3.connect(location(uid, digest).resolve().as_uri() + "?mode=ro", uri=True) as db:
+                with closing(sqlite3.connect(location(uid, digest).resolve().as_uri() + "?mode=ro", uri=True)) as db:
                     if db.execute("PRAGMA quick_check").fetchone()[0] == "ok":
                         return {**report, "imported": True}
             except sqlite3.DatabaseError:

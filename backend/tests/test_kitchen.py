@@ -199,3 +199,20 @@ def test_data_file_survives_backup_copy_and_database_migration_is_additive(env, 
     shutil.copytree(root / "assets", copy_root)
     with sqlite3.connect(next(copy_root.glob("**/*.sqlite"))) as db:
         assert db.execute("SELECT code FROM items ORDER BY idx LIMIT 1").fetchone()[0] == "00123"
+
+
+def test_index_connection_is_closed_before_windows_atomic_move(tmp_path, monkeypatch):
+    opened = []
+    original = sqlite3.connect
+
+    def tracked(*args, **kwargs):
+        connection = original(*args, **kwargs)
+        opened.append(connection)
+        return connection
+
+    monkeypatch.setattr(kitchen.sqlite3, "connect", tracked)
+    kitchen.create_index(tmp_path / "index.partial", fixture_data())
+    assert len(opened) == 1
+    with pytest.raises(sqlite3.ProgrammingError):
+        opened[0].execute("SELECT 1")
+    (tmp_path / "index.partial").replace(tmp_path / "index.sqlite")

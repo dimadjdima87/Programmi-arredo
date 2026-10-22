@@ -50,7 +50,8 @@ Il file importato non viene eseguito né estratto sul filesystem: si legge solta
 `catalogo.json` entro limiti espliciti. HTML e SQLite contenuti nello ZIP vengono
 ignorati. I byte JSON devono corrispondere all'impronta del dataset già verificato;
 il server ricostruisce da zero l'indice locale e attiva il riferimento solo dopo
-il completamento. Una futura edizione richiede una nuova verifica e impronta.
+il completamento. Una futura edizione richiede una nuova verifica e impronta. Le connessioni SQLite
+sono chiuse esplicitamente prima di spostare o sostituire un indice, anche su Windows.
 Un indice mancante può essere ricostruito ricaricando lo stesso pacchetto.
 
 Limiti: upload 20 MB, JSON 50 MB, archivio espanso 180 MB; niente percorsi,
@@ -78,7 +79,7 @@ privato non è necessario per compilare l'applicazione o eseguire i test pubblic
 
 ## Verifiche
 
-API: 29 test SQLite passati, inclusi isolamento, pacchetto alterato, anteprima,
+API: 30 test SQLite passati, inclusi isolamento, pacchetto alterato, anteprima,
 conflitti, conservazione snapshot e ricostruzione dell'indice. Browser web: 4 test
 passati con fixture neutre per la nuova interfaccia. Runtime nativo: 4 test senza
 skip, con il vero pacchetto privato fornito localmente, importazione via proxy e
