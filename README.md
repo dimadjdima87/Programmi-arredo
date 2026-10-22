@@ -176,8 +176,8 @@ hosting, Python o Docker sul computer dell'utente finale. Progetti SQLite e
 campioni restano nel profilo Windows; menu per aprire i dati e creare backup.
 
 Guida e stato reale dell'installer: [docs/windows-desktop.md](docs/windows-desktop.md).
-La build Windows 0.3.0 è riuscita ed è stata installata e avviata nei test su
-Windows. [Scarica dalla build GitHub Actions](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39757995309#artifacts):
+La build Windows 0.3.1 è riuscita ed è stata installata e avviata nei test su
+Windows. [Scarica dalla build GitHub Actions](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39776642545#artifacts):
 accedi a GitHub, scarica `Albertelli-Design-Studio-Windows-x64`, estrai lo ZIP e
-avvia `Albertelli-Design-Studio-Setup-0.3.0-x64.exe`. Prototipo senza firma editore. La pubblicazione dell'ambiente cloud è un'operazione
+avvia `Albertelli-Design-Studio-Setup-0.3.1-x64.exe`. Prototipo senza firma editore. La pubblicazione dell'ambiente cloud è un'operazione
 diversa dalla compilazione e consegna del programma Windows.

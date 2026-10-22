@@ -120,3 +120,23 @@ Esito osservato nelle pagine ufficiali GitHub del run e del job. Il warning
 Node 20 riguarda le versioni delle action, forzate da GitHub a Node 24; non ha
 fatto fallire build o test. Nessuna firma editore e nessuna GitHub Release creata:
 l'installer è distribuito come artifact del workflow, con accesso GitHub.
+
+## Correzione rientro desktop 0.3.1 — 22 ottobre 2026
+
+Il pulsante Esci nella 0.3.0 mostrava il login DEMO web, inutilizzabile con
+l'identità locale del desktop. Ora il client riconosce la modalità dall'health
+protetto e presenta Rientra nello studio senza campi o password DEMO. Il login
+web resta disponibile nella modalità web. Logout ripulisce anche lo stato locale.
+
+- 22 test API SQLite passati e controllo TypeScript riuscito.
+- 4 test desktop passati con payload compilato, incluso reload con cookie valido,
+  logout, assenza campi password e rientro con progetti ancora presenti.
+- Smoke test Electron locale passato con uscita/rientro.
+- Build Windows e collaudo del programma installato passati, inclusa la nuova
+  regressione logout/rientro:
+  https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39776642545
+- Commit applicativo: 36cdd71. Installer versione 0.3.1 disponibile come artifact.
+
+Nessuna migrazione DB o modifica ai percorsi dei dati. Il test Windows è passato
+sul pacchetto generato; l'aggiornamento della specifica installazione dell'utente
+non è stato eseguito dall'agente. Conservare un backup prima di aggiornare.
