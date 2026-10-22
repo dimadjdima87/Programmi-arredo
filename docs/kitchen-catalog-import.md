@@ -5,7 +5,7 @@
 Il manuale fornito dallo studio è la fonte primaria: non viene modificato e non
 viene caricato nel repository o incorporato nell'installer. La biblioteca
 generata permette di cercare codici, sigle, punti e note senza servizi esterni.
-La biblioteca è integrata nel programma tramite import privato dalla versione
+La biblioteca è integrata nel programma tramite import locale dalla versione
 0.4.0; [istruzioni e architettura](kitchen-in-app.md).
 Non è ancora un insieme di prodotti approvati inseribili nella pianta: il modello
 del catalogo attuale non rappresenta matrici di prezzo, regole, unità e ingombri
@@ -13,7 +13,7 @@ configurati. Non importare queste informazioni nel vecchio CSV perdendo campi.
 
 Le aree Living, Bagno e guardaroba del manuale (pagine PDF 841–1024), oltre alla
 pagina di opzioni specifica bagno 187, restano fuori dalla consultazione cucina.
-L'inventario privato conserva comunque tutte le 1.086 pagine. L'illuminazione
+L'inventario completo conserva comunque tutte le 1.086 pagine. L'illuminazione
 integrata nelle opzioni cucina rimane una nota della cucina; non viene creato
 un catalogo autonomo Illuminazione.
 
@@ -47,12 +47,13 @@ Queste dipendenze servono per preparare i dati, non per consultare il risultato.
 - `verifica.json`: audit della fonte, integrità, campione visivo e pagine residue.
 - `SHA256SUMS.txt` e `LEGGIMI.txt`.
 
-JSON/SQLite conservano la fonte testuale originale privata. Nell'HTML le
+JSON/SQLite conservano la fonte testuale originale. Nell'HTML le
 denominazioni vengono adattate al nome dello studio e i recapiti del fornitore
 vengono omessi, senza inventare recapiti Albertelli. L'originale resta l'autorità
 per attribuzioni, condizioni e disegni; il testo di consultazione è una derivazione.
-Il pacchetto contiene dati interni: non pubblicarlo nel repository né in un
-artifact pubblico senza un'istruzione specifica dello studio.
+Il pacchetto contiene dati interni. Lo studio ne ha autorizzato esplicitamente
+la pubblicazione il 22 ottobre 2026 per consentire il download: è disponibile
+nella cartella `downloads/`. Il PDF originale non viene redistribuito.
 
 ## Controlli e significato degli stati
 

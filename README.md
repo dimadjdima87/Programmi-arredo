@@ -1,13 +1,14 @@
 # Albertelli Design Studio AI — DEMO
 
-Studio locale con interfaccia italiana, cucina 2D, moodboard e biblioteca privata
+Studio locale con interfaccia italiana, cucina 2D, moodboard e biblioteca locale
 **Albertelli Kitchen 2026**. La biblioteca comprende codici, varianti, punti e note
-del manuale verificato, caricabili dal pacchetto privato dello studio.
+del manuale verificato, caricabili dal pacchetto catalogo dello studio.
 Gli arredi geometrici e le proposte moodboard restano DEMO; il catalogo non abilita
 ancora inserimento automatico dei mobili reali o calcolo dei costi.
 
 Uso del catalogo, preferiti, articoli per progetto e backup:
 [Albertelli Kitchen nel programma](docs/kitchen-in-app.md).
+[Scarica il pacchetto catalogo ZIP](https://github.com/dimadjdima87/Programmi-arredo/raw/refs/heads/main/downloads/Albertelli-Kitchen-Catalogo-2026.zip).
 
 ## Struttura
 

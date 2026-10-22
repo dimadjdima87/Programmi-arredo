@@ -4,15 +4,17 @@
 
 1. Crea un backup con **Studio → Crea backup dei dati…**, chiudi il programma e
    installa la nuova versione nella stessa cartella. Non occorre disinstallare.
-2. Apri **Albertelli Kitchen** nella barra laterale, premi **Carica catalogo
+2. [Scarica il pacchetto catalogo ZIP](https://github.com/dimadjdima87/Programmi-arredo/raw/refs/heads/main/downloads/Albertelli-Kitchen-Catalogo-2026.zip).
+   Apri **Albertelli Kitchen** nella barra laterale, premi **Carica catalogo
    2026** e scegli `Albertelli-Kitchen-Catalogo-2026.zip` senza estrarlo.
 3. Controlla il riepilogo e premi **Conferma caricamento**. Il pacchetto contiene
    8.870 righe e varianti e 901 pagine cucina; non è il PDF originale.
 
 Il caricamento si fa una volta per lo studio locale. In seguito il catalogo è
 disponibile senza rete, viene conservato negli aggiornamenti e incluso nei backup.
-Il pacchetto è privato e viene consegnato separatamente dall'installer; non viene
-pubblicato nel repository o negli artifact del programma.
+Il pacchetto è separato dall'installer. Su autorizzazione esplicita dello studio
+del 22 ottobre 2026 è scaricabile pubblicamente dalla cartella `downloads/`
+del repository; il PDF originale non è incluso.
 
 ## Organizzazione
 
