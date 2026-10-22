@@ -9,8 +9,13 @@
   backup e ripristino.
 - Finestra Electron Linux verificata con lettura del vero DWG e importazione;
   CSP dedicata al worker, senza abilitare eval nel renderer principale.
-- Il collaudo Windows installerà e avvierà il programma e importerà lo stesso
-  DWG anche nella finestra installata. Vedere lo stato della build Windows.
+- [Build Windows 0.5.0 riuscita](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39837355594):
+  API, payload, backup, finestra Electron e installazione NSIS superati.
+  Il DWG è stato importato e salvato anche nell’app installata (commit `327142b`).
+- [CI sul cambiamento applicativo riuscita](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39836274851):
+  31 test API su SQLite e PostgreSQL, build/typecheck e 7 test frontend.
+  Commit applicativo `818cecf`; `327142b` corregge solo la chiusura del test Windows
+  con modifiche non salvate e aggiunge limiti di durata ai test dell’installer.
 
 Le prove usano un fixture CAD pubblico LibreDWG; non costituiscono una verifica
 di compatibilità con i DWG reali dello studio, che andranno provati.

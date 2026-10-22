@@ -103,11 +103,12 @@ installer e checksum SHA-256. Il workflow non pubblica una release automaticamen
 La build nativa, i test runtime/browser, la finestra Electron e l'installazione
 con avvio del programma installato sono riusciti.
 
-[Stato build e download Windows](https://github.com/dimadjdima87/Programmi-arredo/actions/workflows/windows-desktop.yml).
-La compilazione 0.5.0 viene avviata pubblicando questa modifica. Usare solo
-una build completata con successo. Scaricare l’artifact
-`Albertelli-Design-Studio-Windows-x64`, estrarre lo ZIP e avviare
-`Albertelli-Design-Studio-Setup-0.5.0-x64.exe`. L’artifact contiene SHA256.txt.
+[Build Windows 0.5.0 riuscita e download](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39837355594#artifacts).
+La build del commit `327142b` è stata compilata, installata e avviata su Windows;
+il test ha importato e salvato un DWG reale sia nella finestra non confezionata,
+sia nell’app installata. Scaricare `Albertelli-Design-Studio-Windows-x64`,
+estrarre lo ZIP e avviare `Albertelli-Design-Studio-Setup-0.5.0-x64.exe`.
+L’artifact contiene SHA256.txt.
 
 ## Firma e distribuzione
 

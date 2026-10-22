@@ -182,9 +182,9 @@ hosting, Python o Docker sul computer dell'utente finale. Progetti SQLite e
 campioni restano nel profilo Windows; menu per aprire i dati e creare backup.
 
 Guida e stato reale dell'installer: [docs/windows-desktop.md](docs/windows-desktop.md).
-La versione 0.5.0 include l’importazione locale DWG/DXF e chiude le sezioni catalogo.
-[Stato compilazioni e download Windows](https://github.com/dimadjdima87/Programmi-arredo/actions/workflows/windows-desktop.yml).
-Nella build riuscita scaricare `Albertelli-Design-Studio-Windows-x64`, estrarre
-lo ZIP e avviare `Albertelli-Design-Studio-Setup-0.5.0-x64.exe`.
+La versione Windows **0.5.0** è stata compilata, installata e collaudata con un DWG reale.
+[Scarica dalla build verificata](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39837355594#artifacts):
+scaricare `Albertelli-Design-Studio-Windows-x64`, estrarre lo ZIP e avviare
+`Albertelli-Design-Studio-Setup-0.5.0-x64.exe`.
 Prototipo senza firma editore. La pubblicazione dell’ambiente cloud è distinta
 dalla compilazione e consegna del programma Windows.
