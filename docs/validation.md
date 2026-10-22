@@ -140,3 +140,31 @@ web resta disponibile nella modalità web. Logout ripulisce anche lo stato local
 Nessuna migrazione DB o modifica ai percorsi dei dati. Il test Windows è passato
 sul pacchetto generato; l'aggiornamento della specifica installazione dell'utente
 non è stato eseguito dall'agente. Conservare un backup prima di aggiornare.
+# Catalogo di riferimento cucine — 22 ottobre 2026
+
+Pacchetto privato generato fuori dal repository da manuale SHA-256
+`ce4a42c404d6c41565d523d1c2ad08f116dbcc4318f6c85dbfcdb34dcecdd2c4`.
+Inventario di 1.086 pagine, 901 incluse nella consultazione cucina; 185 differite.
+8.870 occorrenze, comprese varianti e ripetizioni; non sono 8.870 mobili distinti.
+7.749 stringhe codice distinte, con numero maniglia e codice supplemento separati.
+
+- 74.557 celle concordi tra PyMuPDF e Poppler, inclusi trattini di indisponibilità.
+- 4 celle grafiche a zero verificate nelle pagine originali 188 e 189,
+  registrate come controllo visivo, senza attribuire concordanza testuale.
+- 13 occorrenze di regola percentuale del 30%, conservate separatamente dai punti.
+- 46 schede maniglia senza punti espliciti; non equiparate a zero/gratuità.
+- Nessuna discordanza numerica irrisolta; tutti i dati restano esclusi dal calcolo
+  automatico e dall'approvazione commerciale. Compatibilità, geometrie e regole
+  applicabili non sono attestati integralmente da questi controlli.
+- Audit: hash fonte, inventario, integrità SQLite, FTS5, indisponibilità,
+  campione visivo di 29 righe/142 celle; zero errori. Restano due pagine con il
+  termine “punti” e senza tabella: informazioni generali (4) e suggerimenti (1081).
+- 26 test Python passati: formati numerici, errori, ritaglio PDF, apici, griglie,
+  varianti DG, maniglie, evidenza privata e assenza di promozione commerciale.
+- Browser Chromium: ricerca, punti, superfici, percentuali, zeri grafici, maniglie,
+  note, assenza di dipendenze esterne, testo sicuro e layout stretto verificati.
+  Test su loopback perché il browser gestito blocca file://.
+
+Questa consegna è una biblioteca offline, non un nuovo installer Windows né
+un'importazione nel database dell'applicazione. Fonti e pacchetti non pubblicati
+su GitHub. Dettagli in [kitchen-catalog-import.md](kitchen-catalog-import.md).

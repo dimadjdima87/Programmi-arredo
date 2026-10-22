@@ -1,5 +1,24 @@
 # Milestone
 
+## Priorità attuale — cucine Albertelli Kitchen
+
+Completare prima le cucine per l'uso interno dello studio. I cataloghi Living,
+Zona notte, Bagno e Illuminazione saranno forniti in seguito.
+Piano, fonti e campione verificato: [Catalogo cucine 2026](kitchen-catalog-2026.md).
+
+- [x] Acquisizione manuale 2026 e guida qualità, estrazione testuale e primi
+  confronti visivi di codici, punti e regole dei piani.
+- [x] Catalogo di riferimento offline con ricerca, SQLite/JSON, provenienza,
+  doppio controllo numerico, regole percentuali e verifiche visive registrate.
+  Risultati e limiti: [importazione verificata](kitchen-catalog-import.md).
+- [ ] Importazione strutturata e verifica delle sezioni cucina.
+- [ ] Modello dati per varianti, gruppi, punti, unità e note tecniche.
+- [ ] Composizione e collaudo di una cucina con articoli reali verificati.
+- [ ] Calcolo dei costi (successivo): punti / 1,46, quantità e supplementi.
+- [ ] Aggiornamento Windows collaudato.
+
+La sequenza storica delle fasi sotto non supera questa priorità concordata.
+
 ## Fase 0
 - [x] Struttura frontend/backend, Compose PostgreSQL, seed demo, CI e README.
 - [x] Installazione, avvio e test eseguiti, con risultati documentati.

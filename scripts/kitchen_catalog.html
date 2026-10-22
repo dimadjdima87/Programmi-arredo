@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Albertelli Kitchen · Catalogo 2026</title>
+<style>
+:root{color-scheme:light;--ink:#243f35;--muted:#68736c;--paper:#f6f4ed;--line:#d9dfd5}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+header{padding:32px 5vw 22px;border-bottom:1px solid var(--line);background:#fffefa}header p{margin:0;color:var(--muted)}
+h1{font:normal 38px Georgia,serif;margin:8px 0}h2{font:normal 26px Georgia,serif;margin:4px 0 14px}
+main{padding:24px 5vw;max-width:1800px;margin:auto}.notice{padding:14px 18px;background:#ebeede;border-left:3px solid #7b8759;border-radius:4px}
+.tools{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin:24px 0 14px}label{display:block;font-size:14px}input,select,button{font:inherit;border:1px solid #bac5b8;border-radius:5px;padding:10px;background:white;color:var(--ink)}input,select{width:100%;margin-top:6px}button{cursor:pointer}button:hover{background:#edf1e8}button:disabled{opacity:.45;cursor:default}
+.stats{font-size:14px;color:var(--muted);margin:12px 0}.layout{display:grid;grid-template-columns:minmax(340px,1fr) minmax(350px,1.2fr);gap:22px;align-items:start}
+.card{background:white;border:1px solid var(--line);border-radius:8px;overflow:hidden}.item{padding:16px 18px;border-bottom:1px solid var(--line)}.item p{margin:3px 0;font-size:14px}.item button{text-align:left;width:100%;border:none;padding:0;background:transparent}.item button:hover{text-decoration:underline}.item strong{font-size:18px}.badge{display:inline-block;font-size:12px;padding:3px 8px;border-radius:4px;background:#edf1e8;margin:6px 6px 0 0}.warn{background:#fff0da;color:#77501f}.pager{display:flex;gap:12px;align-items:center;padding:14px;justify-content:space-between}
+article{padding:22px}article p{margin:10px 0}table{width:100%;border-collapse:collapse;font-size:14px;margin:16px 0}td,th{text-align:left;padding:8px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:500}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.65 system-ui,sans-serif;background:#f8f8f3;padding:16px;border:1px solid var(--line);border-radius:5px;max-height:70vh;overflow:auto}summary{cursor:pointer;padding:10px 0;font-weight:600}.empty{padding:24px}footer{font-size:13px;padding:20px 5vw;color:var(--muted)}.mode{display:flex;gap:10px;margin-bottom:12px}.mode button[aria-pressed=true]{background:var(--ink);color:white}mark{background:#fbecba;color:inherit}.muted{color:var(--muted)}
+@media(max-width:900px){.layout,.tools{grid-template-columns:1fr}h1{font-size:30px}.layout article{scroll-margin-top:15px}}
+@media print{.tools,.mode,.pager,.results,header p,.notice,footer{display:none}.layout{display:block}pre{max-height:none}article{border:none}.card{border:none}}
+</style>
+<header><p>LO STUDIO · BIBLIOTECA TECNICA</p><h1>Albertelli Kitchen</h1><p>Catalogo cucine · Edizione 2026 · Consultazione locale</p></header>
+<main>
+<div class="notice">Il manuale originale è il riferimento. I punti confrontati con due lettori PDF sono indicati come <strong>controllati</strong>; compatibilità, note e dati da completare restano da verificare. Il calcolo dei costi sarà aggiunto successivamente.</div>
+<div class="tools"><label>Cerca codice, sigla, descrizione o nota<input id="search" type="search" placeholder="Es. 21008, APD60, profondità…" autocomplete="off"></label><label>Sezione<select id="section"><option value="">Tutte le sezioni cucina</option></select></label><label>Controllo dei punti<select id="status"><option value="">Tutti</option><option value="cross_checked">Punti controllati</option><option value="needs_review">Punti da verificare</option><option value="not_listed">Punti non indicati</option><option value="visual_checked">Verifica sulla pagina</option><option value="rule_checked">Regole percentuali</option></select></label></div>
+<div class="mode"><button id="articles" aria-pressed="true">Articoli estratti</button><button id="pages" aria-pressed="false">Manuale e note</button></div>
+<p id="stats" class="stats" role="status" aria-live="polite"></p>
+<div class="layout"><section class="card results" aria-label="Risultati"><div id="list"></div><div class="pager"><button id="prev">← Precedenti</button><span id="range"></span><button id="next">Successivi →</button></div></section><article class="card" id="detail" aria-label="Dettaglio"><h2>Un riferimento per ogni scelta</h2><p>Seleziona un articolo per consultare punti, riferimenti e il testo della pagina.</p><p>La scheda <strong>Manuale e note</strong> permette di cercare anche nelle pagine che non hanno una tabella riconosciuta.</p></article></div>
+</main><footer id="footer"></footer>
+<script id="catalog-data" type="application/json">__CATALOG_DATA__</script>
+<script>
+'use strict';
+const data=JSON.parse(document.getElementById('catalog-data').textContent);
+const $=id=>document.getElementById(id), pageMap=new Map(data.pages.map(p=>[p.page,p]));
+let mode='articles',offset=0,results=[];const size=30;
+const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const fmt=n=>n===null?'Non disponibile':new Intl.NumberFormat('it-IT',{maximumFractionDigits:4}).format(Number(n));
+function node(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
+function badge(text,warn=false){return node('span',text,'badge'+(warn?' warn':''));}
+const sections=[...new Set(data.pages.filter(p=>p.kitchen).map(p=>p.sections[0]||'Informazioni generali'))];
+sections.forEach(s=>{const o=node('option',s);o.value=s;$('section').append(o);});
+const indexedRows=data.rows.map(r=>({r,text:norm(r.code+' '+r.rowLabel+' '+r.context+' '+r.section)}));
+const indexedPages=data.pages.filter(p=>p.kitchen).map(p=>({p,text:norm(p.text+' '+p.sections.join(' '))}));
+function pageText(p,query){const pre=node('pre');if(!query){pre.textContent=p.text;return pre;}const text=p.text;const low=norm(text),q=norm(query);let pos=0,count=0,at=low.indexOf(q);while(at>=0&&count++<100){pre.append(document.createTextNode(text.slice(pos,at)),node('mark',text.slice(at,at+query.length)));pos=at+query.length;at=low.indexOf(q,pos);}pre.append(document.createTextNode(text.slice(pos)));return pre;}
+function evidence(p,opened){const d=node('details');d.open=opened;d.append(node('summary','Testo della pagina '+p.page+(p.reference?' · '+p.reference:'')),pageText(p,$('search').value.trim()));return d;}
+function showPage(p){const d=$('detail');d.replaceChildren(node('h2','Pagina '+p.page),node('p',p.sections.join(' / '),'muted'),node('p','Riferimento stampato: '+(p.reference||'non presente')),evidence(p,true));}
+function showRow(r){const d=$('detail'),p=pageMap.get(r.page);d.replaceChildren(node('h2',(r.codeKind==='handle_number'?'Maniglia / pomello ':'Codice ')+r.code),node('p',r.rowLabel||r.section),node('p','Pagina '+r.page+' · '+r.reference,'muted'));
+ if(r.supplementCode)d.append(node('p','Codice supplemento: '+r.supplementCode));if(r.pricingRules)for(const rule of r.pricingRules)d.append(node('p','Maggiorazione: '+rule.percent+'% · condizioni nella pagina '+rule.basisReference.page));if(!r.cells.length&&!r.pricingRules)d.append(node('p','Punti non indicati nella scheda estratta: consultare le condizioni nel manuale.'));
+ d.append(badge(r.numericStatus==='cross_checked'?'Punti controllati':r.numericStatus==='visual_checked'?'Verificato sulla pagina':r.numericStatus==='rule_checked'?'Regola percentuale verificata':r.numericStatus==='not_listed'?'Punti non indicati':'Punti da verificare',r.numericStatus!=='cross_checked'),badge('Compatibilità e note da verificare',true));
+ const table=node('table'),head=node('tr');head.append(node('th',r.groupKind==='price_group'?'Gruppo prezzi':r.groupKind==='color_group'?'Gruppo colori':'Voce'),node('th','Punti'),node('th','Controllo'));const thead=node('thead');thead.append(head);table.append(thead);const body=node('tbody');r.cells.forEach(c=>{const tr=node('tr');tr.append(node('td',c.group==='single'?'Articolo':c.group),node('td',c.crossChecked?fmt(c.points):(c.raw||'Da verificare')),node('td',c.visuallyVerified?'Verifica sulla pagina':c.crossChecked?'Concorde':'Da verificare'));body.append(tr);});table.append(body);d.append(table,node('p','Le misure e le descrizioni possono essere condivise da più righe: consulta la pagina completa prima di utilizzare l’articolo.'));
+ if(r.hasFootnoteMarker)d.append(node('p','Sono presenti richiami di nota vicino ai valori: controllare esclusioni e condizioni.','notice'));
+ const b=node('button','Apri pagina e note');b.onclick=()=>showPage(p);d.append(b,evidence(p,true));}
+function draw(){const list=$('list');list.replaceChildren();if(!results.length)list.append(node('p','Nessun risultato. Prova anche in “Manuale e note”.','empty'));results.slice(offset,offset+size).forEach(v=>{const item=node('div',undefined,'item'),b=node('button');if(mode==='articles'){b.append(node('strong',v.code),node('p',v.rowLabel||v.section),node('p','Pagina '+v.page+' · '+v.reference));b.onclick=()=>showRow(v);item.append(b,badge(v.numericStatus==='cross_checked'?'Punti controllati':v.numericStatus==='visual_checked'?'Verificato sulla pagina':v.numericStatus==='rule_checked'?'Regola percentuale verificata':v.numericStatus==='not_listed'?'Punti non indicati':'Da verificare',v.numericStatus!=='cross_checked'));}else{b.append(node('strong','Pagina '+v.page+(v.reference?' · '+v.reference:'')),node('p',v.sections.slice(-1)[0]||'Informazioni generali'));b.onclick=()=>showPage(v);item.append(b);}list.append(item);});$('range').textContent=results.length?(offset+1)+'–'+Math.min(offset+size,results.length)+' di '+results.length:'0 risultati';$('prev').disabled=offset===0;$('next').disabled=offset+size>=results.length;$('stats').textContent=(mode==='articles'?results.length+' occorrenze di articoli':results.length+' pagine')+' · '+data.manifest.kitchenPages+' pagine di riferimento cucina · Nessun articolo ancora approvato per il calcolo costi';}
+function search(){offset=0;const terms=norm($('search').value.trim()).split(/\s+/).filter(Boolean),s=$('section').value,status=$('status').value;if(mode==='articles'){results=indexedRows.filter(({r,text})=>(!s||pageMap.get(r.page).sections[0]===s)&&(!status||r.numericStatus===status)&&terms.every(t=>text.includes(t))).map(v=>v.r);const exact=norm($('search').value.trim());results.sort((a,b)=>Number(norm(b.code)===exact)-Number(norm(a.code)===exact));}else{results=indexedPages.filter(({p,text})=>(!s||p.sections[0]===s)&&terms.every(t=>text.includes(t))).map(v=>v.p);}draw();}
+let timer;$('search').oninput=()=>{clearTimeout(timer);timer=setTimeout(search,180);};$('section').onchange=search;$('status').onchange=search;
+for(const m of ['articles','pages'])$(m).onclick=()=>{mode=m;$('articles').setAttribute('aria-pressed',m==='articles');$('pages').setAttribute('aria-pressed',m==='pages');$('status').disabled=m==='pages';search();};
+$('prev').onclick=()=>{offset=Math.max(0,offset-size);draw();};$('next').onclick=()=>{offset+=size;draw();};
+$('footer').textContent='Albertelli Kitchen · Fonte 2026 · '+data.manifest.articleOccurrences+' occorrenze estratte · Il catalogo funziona senza collegamenti a servizi esterni.';search();
+</script>
+</html>

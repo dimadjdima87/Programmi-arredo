@@ -1,0 +1,2 @@
+# Extraction/verification tools only; not part of the installed desktop runtime.
+PyMuPDF==1.26.6
