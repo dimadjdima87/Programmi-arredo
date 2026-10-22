@@ -11,14 +11,14 @@ Piano, fonti e campione verificato: [Catalogo cucine 2026](kitchen-catalog-2026.
 - [x] Catalogo di riferimento offline con ricerca, SQLite/JSON, provenienza,
   doppio controllo numerico, regole percentuali e verifiche visive registrate.
   Risultati e limiti: [importazione verificata](kitchen-catalog-import.md).
-- [ ] Importazione strutturata e verifica delle sezioni cucina.
+- [x] Importazione privata della biblioteca verificata, con punti, varianti e note conservati.
 - [x] Biblioteca integrata nell'app: import privato, categorie, ricerca, dettagli e note.
 - [x] Preferiti ed elenchi per progetto con quantità, note e snapshot conservati.
 - [x] Catalogo ed elenchi inclusi nel backup; apertura reale della copia verificata.
-- [ ] Modello dati per varianti, gruppi, punti, unità e note tecniche.
+- [ ] Modello configurabile per ingombri, unità di conteggio e compatibilità dei mobili reali.
 - [ ] Composizione e collaudo di una cucina con articoli reali verificati.
 - [ ] Calcolo dei costi (successivo): punti / 1,46, quantità e supplementi.
-- [ ] Aggiornamento Windows collaudato.
+- [x] Aggiornamento Windows 0.4.0 compilato, installato e collaudato (22 ottobre 2026).
 
 La sequenza storica delle fasi sotto non supera questa priorità concordata.
 

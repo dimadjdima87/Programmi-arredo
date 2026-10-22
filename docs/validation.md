@@ -165,6 +165,39 @@ Inventario di 1.086 pagine, 901 incluse nella consultazione cucina; 185 differit
   note, assenza di dipendenze esterne, testo sicuro e layout stretto verificati.
   Test su loopback perché il browser gestito blocca file://.
 
-Questa consegna è una biblioteca offline, non un nuovo installer Windows né
+La consegna precedente alla 0.4.0 era una biblioteca offline, non un nuovo installer Windows né
 un'importazione nel database dell'applicazione. Fonti e pacchetti non pubblicati
 su GitHub. Dettagli in [kitchen-catalog-import.md](kitchen-catalog-import.md).
+
+## Biblioteca cucina integrata e Windows 0.4.0 — 22 ottobre 2026
+
+Fonte applicativa: commit `0861079`. Biblioteca privata verificata caricabile dal
+programma, categorie e ricerca FTS5, punti/regole/pagine, preferiti e articoli per
+progetto con quantità, note, revisione e snapshot. Le pagine aperte da una scelta
+restano quelle del dataset conservato, anche dopo un aggiornamento del catalogo.
+
+- 30 test API locali passati; nuova regressione sulla chiusura delle connessioni
+  SQLite prima dello spostamento atomico dell'indice su Windows.
+- Build frontend e TypeScript passati; 4 test browser web passati, compresi elenco
+  progetto, preferiti, note, quantità ed esportazione senza modificare la scena.
+- API nativa PyInstaller, frontend standalone e Node di Electron: 4 test senza
+  skip con il pacchetto autentico da 8.870 occorrenze, caricamento reale via proxy
+  e browser, ricerca, scelte, riavvio e copia di backup riaperta e consultabile.
+- Finestra Electron Linux collaudata con profilo e cache scrivibili; import di
+  pacchetto errato rifiutato con messaggio leggibile.
+- [CI generale riuscita](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39831053554):
+  test API SQLite e PostgreSQL, build/TypeScript e browser tutti riusciti.
+- [Windows 0.4.0 riuscito e download](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39831052749#artifacts):
+  30 test API con fixture neutre nel build nativo Windows, generazione NSIS,
+  runtime/browser/backup, Electron, installazione silenziosa e collaudo del
+  programma installato tutti riusciti. Nessun pacchetto privato trasferito alla CI.
+
+Artifact `Albertelli-Design-Studio-Windows-x64`, id `12449750346`, 134 MB;
+installer `Albertelli-Design-Studio-Setup-0.4.0-x64.exe`, con `SHA256.txt`.
+Digest dell'artifact:
+`a4ce5815f3e2993cbf0beb8e5dc38724c8f0684a6df237da19f94c09b2ae72d8`.
+
+Il catalogo autentico è stato verificato sul runtime Linux compilato; su Windows
+la pipeline usa fixture neutre e collauda l'installer e la nuova sezione. Il ZIP
+privato viene caricato una volta dall'utente ed entra nei backup locali. Non sono
+stati abilitati calcolo costi o inserimento automatico di ingombri non validati.

@@ -6,7 +6,7 @@ Destinazione: Windows 10/11 **x64**. ARM64 e Windows precedenti non sono previst
 Il programma finale si installa per utente, con collegamenti nel menu Start e
 sul desktop. L'installer include Electron/Node, interfaccia Next e backend Python
 compilato: l'utente finale non dovrà installare Python, Node, Docker o PostgreSQL,
-né pagare un hosting. È comunque necessario collaudare l'installer su Windows.
+né pagare un hosting. Ogni nuova compilazione va collaudata su Windows.
 
 Le funzioni locali comprendono pianta 2D, cataloghi, campioni, versioni, moodboard
 DEMO e export. Le proposte IA restano il mock dichiarato: non richiedono rete.
@@ -105,9 +105,9 @@ installer e checksum SHA-256. Il workflow non pubblica una release automaticamen
 La build nativa, i test runtime/browser, la finestra Electron e l'installazione
 con avvio del programma installato sono riusciti.
 
-[Build Windows riuscita e download](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39776642545#artifacts).
+[Build Windows riuscita e download](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39831052749#artifacts).
 Accedere a GitHub, scaricare l'artifact `Albertelli-Design-Studio-Windows-x64`
-(134 MB), estrarre lo ZIP e avviare `Albertelli-Design-Studio-Setup-0.3.1-x64.exe`.
+(134 MB), estrarre lo ZIP e avviare `Albertelli-Design-Studio-Setup-0.4.0-x64.exe`.
 L'artifact contiene anche SHA256.txt. È un prototipo; la firma editore non è
 ancora configurata.
 
