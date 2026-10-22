@@ -455,7 +455,7 @@ def test_catalog_migration_repeatable_preserves_projects(client, payload):
 
 def test_desktop_session_disabled_on_web(client):
     assert client.post('/api/desktop-session').status_code == 404
-    assert client.get('/api/health').json() == {'status':'ok'}
+    assert client.get('/api/health').json() == {'status':'ok','desktop':False}
 
 
 def test_desktop_token_gate_and_local_session(client, monkeypatch):
@@ -463,6 +463,7 @@ def test_desktop_token_gate_and_local_session(client, monkeypatch):
     assert client.get('/api/health').status_code == 401
     assert client.post('/api/desktop-session').status_code == 401
     headers={'x-studio-desktop-token':'test-private-process-key'}
+    assert client.get('/api/health',headers=headers).json()['desktop'] is True
     client.post('/api/logout',headers=headers)
     assert client.get('/api/me',headers=headers).status_code == 401
     assert client.post('/api/desktop-session',headers=headers).status_code == 200

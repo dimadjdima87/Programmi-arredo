@@ -28,7 +28,7 @@ async def desktop_guard(request: Request, call_next):
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "desktop": bool(os.getenv("DESKTOP_API_TOKEN"))}
 
 
 class Strict(BaseModel):

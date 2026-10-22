@@ -69,7 +69,7 @@ test("avvio fallito rilascia i componenti e mantiene i dati", async () => {
   }
 });
 test(
-  "payload reale: servizi privati, login locale, progetto, campione, riavvio e backup ripristinabile",
+  "payload reale: accesso locale, uscita/rientro, progetto, riavvio e backup ripristinabile",
   { timeout: 120000 },
   async (t) => {
     try {
@@ -244,6 +244,28 @@ test(
             .getByRole("status")
             .filter({ hasText: "Salvata revisione 1" })
             .waitFor();
+          await page.reload();
+          await page
+            .getByRole("button", { name: "Nuovo progetto cucina" })
+            .waitFor();
+          await page.getByRole("button", { name: "Esci", exact: true }).click();
+          await page
+            .getByRole("heading", { name: "Studio locale", exact: true })
+            .waitFor();
+          assert.equal(
+            await page.getByLabel("Password", { exact: true }).count(),
+            0,
+          );
+          assert.equal(
+            await page
+              .getByText("Password iniziale:", { exact: false })
+              .count(),
+            0,
+          );
+          await page
+            .getByRole("button", { name: "Rientra nello studio", exact: false })
+            .click();
+          await page.getByRole("button", { name: /Cucina desktop/ }).waitFor();
           await fs.mkdir(path.resolve(__dirname, "../test-results"), {
             recursive: true,
           });

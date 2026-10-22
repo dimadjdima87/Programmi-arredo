@@ -38,6 +38,7 @@ function download(url: string, name: string) {
   a.click();
 }
 export default function Studio() {
+  const [desktopMode, setDesktopMode] = useState<boolean | null>(null);
   const [email, setEmail] = useState("designer@demo.local"),
     [password, setPassword] = useState("DemoStudio2026!"),
     [user, setUser] = useState("");
@@ -59,6 +60,9 @@ export default function Studio() {
     [pan, setPan] = useState(false);
   const stage = useRef<Konva.Stage>(null);
   useEffect(() => {
+    api("/health")
+      .then((h) => setDesktopMode(h.desktop === true))
+      .catch(() => setDesktopMode(false));
     api("/me")
       .then((u) => {
         setUser(u.email);
@@ -348,6 +352,12 @@ export default function Studio() {
     );
     download(c.toDataURL(), "moodboard-revisione-" + p.revision + ".png");
   }
+  if (!user && desktopMode === null)
+    return (
+      <main className="login">
+        <p>Avvio dello studio…</p>
+      </main>
+    );
   if (!user)
     return (
       <main className="login">
@@ -366,7 +376,11 @@ export default function Studio() {
           onSubmit={(e) => {
             e.preventDefault();
             run(async () => {
-              const u = await api("/login", "POST", { email, password });
+              const u = await api(
+                desktopMode ? "/desktop-session" : "/login",
+                "POST",
+                desktopMode ? undefined : { email, password },
+              );
               setUser(u.email);
               await refresh();
               setStatus("");
@@ -374,34 +388,44 @@ export default function Studio() {
           }}
         >
           <span className="eyebrow">BENVENUTO NELLO STUDIO</span>
-          <h2>Accedi al tuo spazio</h2>
-          <p>Ambiente dimostrativo, senza dati cliente reali.</p>
-          <label>
-            Email
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </label>
-          <label>
-            Password
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </label>
-          <button className="primary" disabled={busy}>
-            Entra nello studio →
-          </button>
-          <p className="hint">
-            Account DEMO: designer@demo.local oppure viewer@demo.local
-            <br />
-            Password iniziale: DemoStudio2026!
+          <h2>{desktopMode ? "Studio locale" : "Accedi al tuo spazio"}</h2>
+          <p>
+            {desktopMode
+              ? "I progetti sono conservati su questo computer. Puoi rientrare senza inserire credenziali."
+              : "Ambiente dimostrativo, senza dati cliente reali."}
           </p>
+          {!desktopMode && (
+            <>
+              <label>
+                Email
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </label>
+              <label>
+                Password
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </label>
+            </>
+          )}
+          <button className="primary" disabled={busy}>
+            {desktopMode ? "Rientra nello studio →" : "Entra nello studio →"}
+          </button>
+          {!desktopMode && (
+            <p className="hint">
+              Account DEMO: designer@demo.local oppure viewer@demo.local
+              <br />
+              Password iniziale: DemoStudio2026!
+            </p>
+          )}
           <p role="status">{status}</p>
         </form>
       </main>
@@ -456,6 +480,15 @@ export default function Studio() {
                   setUser("");
                   setP(null);
                   setDirty(false);
+                  setList([]);
+                  setPast([]);
+                  setFuture([]);
+                  setSelected("");
+                  setStatus(
+                    desktopMode
+                      ? "Sessione locale chiusa. Puoi rientrare senza password."
+                      : "",
+                  );
                 });
             }}
           >

@@ -12,6 +12,15 @@ Le funzioni locali comprendono pianta 2D, cataloghi, campioni, versioni, moodboa
 DEMO e export. Le proposte IA restano il mock dichiarato: non richiedono rete.
 Integrazioni IA reali, sincronizzazione e progetti condivisi non sono inclusi.
 
+### Accesso e uscita
+
+Nella versione Windows l'accesso locale è automatico e non richiede una password.
+Le credenziali DEMO indicate per la versione web non sono la password del desktop.
+Dalla versione 0.3.1, dopo **Esci** compare **Rientra nello studio**, che riapre
+la sessione locale senza credenziali. I progetti salvati restano disponibili.
+Nella 0.3.0, per superare la schermata di login errata basta chiudere completamente
+il programma e riaprirlo dal menu Start.
+
 ### Dati e backup
 
 I dati sono separati dai file del programma, normalmente in:
