@@ -1,0 +1,66 @@
+name: Windows desktop installer
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'desktop/**'
+      - 'backend/**'
+      - 'frontend/**'
+      - '.github/workflows/windows-desktop.yml'
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            desktop/package-lock.json
+      - name: Build native API, standalone web and installer
+        shell: pwsh
+        run: ./desktop/scripts/build-windows.ps1
+      - name: Install Playwright browser
+        working-directory: frontend
+        run: npx playwright install chromium
+      - name: Test native payload, browser, backup and restore
+        env:
+          STUDIO_REQUIRE_PAYLOAD: '1'
+          STUDIO_TEST_ELECTRON_NODE: '1'
+          DESKTOP_BROWSER_TEST: '1'
+        run: npm --prefix desktop test
+      - name: Test unpackaged Electron window
+        run: node desktop/scripts/smoke-electron.cjs
+      - name: Install and test Windows application
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem desktop/release/*Setup*.exe | Select-Object -First 1
+          if (-not $installer) { throw 'Installer non trovato' }
+          $target = Join-Path $env:RUNNER_TEMP 'AlbertelliInstalled'
+          $result = Start-Process -FilePath $installer.FullName -ArgumentList '/S', "/D=$target" -Wait -PassThru
+          if ($result.ExitCode -ne 0) { throw "Installazione fallita: $($result.ExitCode)" }
+          $env:STUDIO_INSTALLED_EXE = Join-Path $target 'Albertelli Design Studio.exe'
+          node desktop/scripts/smoke-electron.cjs
+          if ($LASTEXITCODE -ne 0) { throw 'Collaudo programma installato fallito' }
+          Get-FileHash $installer.FullName -Algorithm SHA256 | Format-List | Out-File desktop/release/SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Albertelli-Design-Studio-Windows-x64
+          path: |
+            desktop/release/*Setup*.exe
+            desktop/release/SHA256.txt
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Windows-desktop-test-logs
+          path: desktop/test-results

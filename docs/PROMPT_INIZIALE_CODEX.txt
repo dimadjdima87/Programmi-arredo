@@ -1,0 +1,15 @@
+Sei l'architetto software e sviluppatore full-stack senior del progetto "Albertelli Design Studio AI".
+
+Leggi integralmente il file ALBERTELLI_DESIGN_STUDIO_AI_SPEC.md nella root del progetto. Quello è il documento dei requisiti e la fonte principale delle decisioni.
+
+OBIETTIVO INIZIALE: sviluppa soltanto Fase 0 + Fase 1 (prototipo verticale funzionante). Non provare a realizzare subito tutti i moduli. Voglio una web app desktop-first, con interfaccia in italiano e dati demo non attribuiti falsamente a marchi reali.
+
+Prima di implementare, crea docs/architecture.md e docs/milestones.md, con diagramma dei componenti, scelte tecnologiche, confini di fiducia e criteri verificabili. Poi scrivi il codice e prova davvero installazione, avvio e test nel tuo ambiente.
+
+Voglio poter: creare un progetto cucina; definire una stanza 4200 x 3600 mm; modificare i muri; aggiungere una porta e una finestra; posizionare elementi demo; salvare, ricaricare e annullare modifiche; generare almeno due moodboard dimostrative con palette modificabili; esportare il risultato.
+
+Principi irrinunciabili: coordinate e misure precise come dati strutturati, niente prodotti o codici inventati presentati come reali, IA creativa separata dal progetto tecnico, modifiche non distruttive, versioni salvate, protezione dei dati cliente, API keys soltanto lato server.
+
+Al termine consegna: struttura repository, file modificati, comandi esatti per avvio e test, risultati dei test effettivamente eseguiti, limiti del prototipo e proposta del milestone successivo.
+
+Se qualche dipendenza è indisponibile, usa un mock chiaramente etichettato e spiega esattamente cosa manca; non simulare un test riuscito. Procedi con le scelte tecniche reversibili senza interromperti per domande non bloccanti.

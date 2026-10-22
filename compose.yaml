@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: studio
+      POSTGRES_USER: studio
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-demo-only}
+    volumes:
+      - studio-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studio"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://studio:${POSTGRES_PASSWORD:-local-demo-only}@db:5432/studio
+      DEMO_PASSWORD: ${DEMO_PASSWORD:-DemoStudio2026!}
+      ASSET_DIR: /data/assets
+      COOKIE_SECURE: ${COOKIE_SECURE:-0}
+    volumes:
+      - studio-assets:/data/assets
+    depends_on:
+      db:
+        condition: service_healthy
+  web:
+    build: ./frontend
+    environment:
+      API_URL: http://api:8000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - api
+volumes:
+  studio-data:
+  studio-assets:

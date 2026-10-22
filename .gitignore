@@ -1,0 +1,17 @@
+node_modules/
+.next/
+.venv/
+__pycache__/
+.pytest_cache/
+*.db
+.env
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+.studio-assets/
+
+desktop/staged/
+desktop/build-api/
+desktop/build-pyinstaller/
+desktop/release/
