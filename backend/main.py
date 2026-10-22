@@ -88,11 +88,45 @@ class Moodboard(Strict):
         return self
 
 
+class CadPath(Strict):
+    layer: str = Field(max_length=100)
+    points: list[float] = Field(min_length=4, max_length=20000)
+
+    @model_validator(mode="after")
+    def coordinates(self):
+        if len(self.points) % 2 or any(v < 0 or v > 50000 for v in self.points):
+            raise ValueError("Coordinate CAD non valide")
+        return self
+
+
+class CadReference(Strict):
+    filename: str = Field(min_length=1, max_length=255)
+    sha256: str = Field(pattern="^[a-f0-9]{64}$")
+    format: str = Field(pattern="^(dwg|dxf)$")
+    sourceUnit: str = Field(max_length=30)
+    millimetersPerUnit: float = Field(gt=0, le=1000000)
+    width: float = Field(gt=0, le=50000)
+    height: float = Field(gt=0, le=50000)
+    originX: float
+    originY: float
+    paths: list[CadPath] = Field(min_length=1, max_length=5000)
+    warnings: list[str] = Field(max_length=50)
+
+    @model_validator(mode="after")
+    def size(self):
+        if sum(len(p.points) for p in self.paths) > 120000:
+            raise ValueError("Planimetria troppo dettagliata")
+        if any(len(w) > 300 for w in self.warnings):
+            raise ValueError("Nota CAD troppo lunga")
+        return self
+
+
 class Scene(Strict):
     schemaVersion: str = Field(default="1.0", pattern="^1\\.0$")
     units: str = Field(default="mm", pattern="^mm$")
     height: float = Field(gt=0, le=6000)
-    walls: list[Wall] = Field(min_length=3, max_length=100)
+    reference: CadReference | None = None
+    walls: list[Wall] = Field(max_length=100)
     openings: list[Opening] = Field(max_length=100)
     items: list[Item] = Field(max_length=500)
     moodboards: list[Moodboard] = Field(min_length=2, max_length=10)
@@ -108,6 +142,10 @@ class Scene(Strict):
         if len(ids) != len(set(ids)):
             fail("Identificativi duplicati")
         n = len(self.walls)
+        if n < 3:
+            if n == 0 and self.reference and not self.openings:
+                return self
+            fail("Definire almeno tre vertici o importare una planimetria CAD")
 
         def cross(a, b, c):
             return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)

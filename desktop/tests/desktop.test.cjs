@@ -291,25 +291,9 @@ test(
             .getByRole("button", { name: "Rientra nello studio", exact: false })
             .click();
           await page.getByRole("button", { name: /Cucina desktop/ }).waitFor();
-          await page.locator(".sidebar").getByRole("button", { name: "Albertelli Kitchen", exact: true }).click();
-          if (process.env.STUDIO_KITCHEN_PACKAGE) {
-            await page.getByLabel("Pacchetto catalogo Albertelli Kitchen").setInputFiles(process.env.STUDIO_KITCHEN_PACKAGE);
-            await page.getByRole("button", { name: "Conferma caricamento" }).click();
-            await page.getByRole("status").filter({ hasText: "Catalogo Albertelli Kitchen caricato" }).waitFor();
-            await page.getByLabel("Cerca nel catalogo").fill("21008");
-            await page.getByRole("button", { name: /CODICE 21008/ }).first().click();
-            await page.locator(".k-detail table").waitFor();
-            assert.match(await page.locator(".k-detail table").innerText(), /1\.?006/);
-            await page.getByRole("button", { name: "Salva nei preferiti", exact: true }).click();
-            await page.getByRole("status").filter({ hasText: "Articolo salvato nei preferiti" }).waitFor();
-            await page.getByRole("button", { name: "Preferiti", exact: true }).click();
-            await page.locator(".k-pick").first().waitFor();
-            await page.locator(".k-pick .k-link").first().click();
-            await page.locator(".k-detail table").waitFor();
-            assert.match(await page.locator(".k-detail table").innerText(), /1\.?006/);
-          } else {
-            await page.getByRole("heading", { name: "Tutto il catalogo cucina in un solo spazio." }).waitFor();
-          }
+          assert.equal(await page.getByRole("button", { name: "Albertelli Kitchen", exact: true }).count(), 0);
+          await page.getByRole("button", { name: "Importa planimetria DWG / DXF" }).click();
+          await page.getByRole("heading", { name: "Importa la planimetria" }).waitFor();
           await fs.mkdir(path.resolve(__dirname, "../test-results"), {
             recursive: true,
           });

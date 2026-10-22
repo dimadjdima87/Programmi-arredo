@@ -468,3 +468,24 @@ def test_desktop_token_gate_and_local_session(client, monkeypatch):
     assert client.get('/api/me',headers=headers).status_code == 401
     assert client.post('/api/desktop-session',headers=headers).status_code == 200
     assert client.get('/api/me',headers=headers).status_code == 200
+
+
+def test_cad_reference_roundtrip_and_validation(client, payload):
+    payload["scene"]["walls"] = []
+    payload["scene"]["openings"] = []
+    ref = dict(filename="pianta.dwg", sha256="a" * 64, format="dwg", sourceUnit="Metri",
+               millimetersPerUnit=1000, width=4200, height=3600, originX=-10, originY=24,
+               paths=[dict(layer="Muri", points=[0, 0, 4200, 0, 4200, 3600])], warnings=[])
+    payload["scene"]["reference"] = ref
+    result = client.post("/api/projects", json=payload)
+    assert result.status_code == 201, result.text
+    saved = client.get("/api/projects/" + result.json()["id"]).json()
+    assert saved["scene"]["reference"] == ref
+    assert saved["scene"]["walls"] == []
+    ref["paths"][0]["points"][0] = float("inf")
+    with pytest.raises(ValueError):
+        m.Scene.model_validate(payload["scene"])
+    ref["paths"][0]["points"] = [0, 0, 1]
+    assert client.post("/api/projects", json=payload).status_code == 422
+    payload["scene"].pop("reference")
+    assert client.post("/api/projects", json=payload).status_code == 422

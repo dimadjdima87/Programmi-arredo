@@ -1,4 +1,8 @@
-# Albertelli Kitchen nel programma — 0.4.0
+# Albertelli Kitchen nel programma — archivio 0.4.0
+
+Dal 22 ottobre 2026 le sezioni catalogo sono chiuse nell’interfaccia, su
+richiesta dello studio. Questa guida descrive la versione precedente.
+I dati locali e le API restano conservati. Vedere [planimetrie](cad-import.md).
 
 ## Utilizzo su Windows
 

@@ -1,0 +1,5 @@
+plan-polyline.dwg is test/test-data/2000/Polyline.dwg from LibreDWG,
+commit a8ccb1f314d9feb2215be67d1f6f2a3d64b2c9a0.
+https://github.com/LibreDWG/libredwg
+GPL-3.0-or-later; see frontend/public/cad/COPYING.
+This is a public CAD test fixture, not a client drawing.

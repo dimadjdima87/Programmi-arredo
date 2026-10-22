@@ -1,4 +1,4 @@
-# Applicazione desktop Windows — confezionamento 0.4.0
+# Applicazione desktop Windows — confezionamento 0.5.0
 
 ## Per chi userà il programma
 
@@ -8,18 +8,16 @@ sul desktop. L'installer include Electron/Node, interfaccia Next e backend Pytho
 compilato: l'utente finale non dovrà installare Python, Node, Docker o PostgreSQL,
 né pagare un hosting. Ogni nuova compilazione va collaudata su Windows.
 
-Le funzioni locali comprendono pianta 2D, cataloghi, campioni, versioni, moodboard
+Le funzioni locali comprendono pianta 2D con importazione DWG/DXF, versioni, moodboard
 DEMO e export. Le proposte IA restano il mock dichiarato: non richiedono rete.
 Integrazioni IA reali, sincronizzazione e progetti condivisi non sono inclusi.
 
-### Catalogo Albertelli Kitchen (0.4.0)
+### Planimetria DWG / DXF (0.5.0)
 
-Dopo l'aggiornamento aprire **Albertelli Kitchen → Carica catalogo 2026**, scegliere
-il pacchetto ZIP privato già preparato e confermare il riepilogo. Basta un solo
-caricamento: ricerca, punti, note, preferiti e articoli del progetto funzionano
-offline e rientrano nei backup. Il pacchetto è consegnato separatamente dal
-programma, per mantenere interno il materiale dello studio.
-[Istruzioni complete](kitchen-in-app.md).
+Usare **Importa planimetria DWG / DXF**, scegliere il file e confermare unità,
+anteprima e misure. L’importazione è locale e resta disponibile senza rete.
+Il catalogo è chiuso nell’interfaccia; i dati precedenti vengono conservati.
+[Istruzioni e limiti](cad-import.md). Il riconoscimento IA è il passaggio successivo.
 
 ### Accesso e uscita
 
@@ -105,11 +103,11 @@ installer e checksum SHA-256. Il workflow non pubblica una release automaticamen
 La build nativa, i test runtime/browser, la finestra Electron e l'installazione
 con avvio del programma installato sono riusciti.
 
-[Build Windows riuscita e download](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39831052749#artifacts).
-Accedere a GitHub, scaricare l'artifact `Albertelli-Design-Studio-Windows-x64`
-(134 MB), estrarre lo ZIP e avviare `Albertelli-Design-Studio-Setup-0.4.0-x64.exe`.
-L'artifact contiene anche SHA256.txt. È un prototipo; la firma editore non è
-ancora configurata.
+[Stato build e download Windows](https://github.com/dimadjdima87/Programmi-arredo/actions/workflows/windows-desktop.yml).
+La compilazione 0.5.0 viene avviata pubblicando questa modifica. Usare solo
+una build completata con successo. Scaricare l’artifact
+`Albertelli-Design-Studio-Windows-x64`, estrarre lo ZIP e avviare
+`Albertelli-Design-Studio-Setup-0.5.0-x64.exe`. L’artifact contiene SHA256.txt.
 
 ## Firma e distribuzione
 

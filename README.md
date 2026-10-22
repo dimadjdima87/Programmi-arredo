@@ -1,14 +1,13 @@
-# Albertelli Design Studio AI — DEMO
+# Albertelli Design Studio
 
-Studio locale con interfaccia italiana, cucina 2D, moodboard e biblioteca locale
-**Albertelli Kitchen 2026**. La biblioteca comprende codici, varianti, punti e note
-del manuale verificato, caricabili dal pacchetto catalogo dello studio.
-Gli arredi geometrici e le proposte moodboard restano DEMO; il catalogo non abilita
-ancora inserimento automatico dei mobili reali o calcolo dei costi.
+La versione 0.5.0 sposta il lavoro sulla planimetria: importa un **DWG o DXF**,
+controlla anteprima, unità e livelli, quindi salva la base 2D nel progetto.
+Il file viene letto localmente, anche senza Internet nella versione Windows.
+Le sezioni catalogo sono state chiuse su richiesta dello studio; i dati già
+salvati restano conservati. L’IA per riconoscere ambienti e aperture sarà un
+passaggio successivo. Gli arredi generici e le moodboard restano dimostrativi.
 
-Uso del catalogo, preferiti, articoli per progetto e backup:
-[Albertelli Kitchen nel programma](docs/kitchen-in-app.md).
-[Scarica il pacchetto catalogo ZIP](https://github.com/dimadjdima87/Programmi-arredo/raw/refs/heads/main/downloads/Albertelli-Kitchen-Catalogo-2026.zip).
+[Guida all’importazione della planimetria](docs/cad-import.md).
 
 ## Struttura
 
@@ -183,8 +182,9 @@ hosting, Python o Docker sul computer dell'utente finale. Progetti SQLite e
 campioni restano nel profilo Windows; menu per aprire i dati e creare backup.
 
 Guida e stato reale dell'installer: [docs/windows-desktop.md](docs/windows-desktop.md).
-La build Windows 0.4.0 è riuscita ed è stata installata e avviata nei test su
-Windows. [Scarica dalla build GitHub Actions](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39831052749#artifacts):
-accedi a GitHub, scarica `Albertelli-Design-Studio-Windows-x64`, estrai lo ZIP e
-avvia `Albertelli-Design-Studio-Setup-0.4.0-x64.exe`. Prototipo senza firma editore. La pubblicazione dell'ambiente cloud è un'operazione
-diversa dalla compilazione e consegna del programma Windows.
+La versione 0.5.0 include l’importazione locale DWG/DXF e chiude le sezioni catalogo.
+[Stato compilazioni e download Windows](https://github.com/dimadjdima87/Programmi-arredo/actions/workflows/windows-desktop.yml).
+Nella build riuscita scaricare `Albertelli-Design-Studio-Windows-x64`, estrarre
+lo ZIP e avviare `Albertelli-Design-Studio-Setup-0.5.0-x64.exe`.
+Prototipo senza firma editore. La pubblicazione dell’ambiente cloud è distinta
+dalla compilazione e consegna del programma Windows.

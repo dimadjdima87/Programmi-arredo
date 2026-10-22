@@ -19,6 +19,9 @@ const path = require("node:path");
   });
   try {
     const window = await app.firstWindow({ timeout: 90000 });
+    window.on("pageerror", (error) =>
+      console.error("Renderer:", error.message),
+    );
     await window
       .getByRole("button", { name: "Nuovo progetto cucina" })
       .waitFor({ timeout: 60000 });
@@ -46,12 +49,32 @@ const path = require("node:path");
       .waitFor();
     if (await window.evaluate(() => typeof require !== "undefined"))
       throw new Error("Node esposto nel renderer");
-    await window.locator(".sidebar").getByRole("button", { name: "Albertelli Kitchen", exact: true }).click();
-    await window.getByRole("heading", { name: "Albertelli Kitchen", exact: true }).waitFor();
-    await window.getByLabel("Pacchetto catalogo Albertelli Kitchen").setInputFiles({
-      name: "catalogo-non-valido.zip", mimeType: "application/zip", buffer: Buffer.from("not a catalog"),
-    });
-    await window.locator(".k-message").filter({ hasText: "Pacchetto di catalogo non valido" }).waitFor();
+    await window
+      .getByRole("button", { name: "Importa planimetria DWG / DXF" })
+      .click();
+    await window
+      .getByRole("heading", { name: "Importa la planimetria" })
+      .waitFor();
+    await window
+      .getByLabel("File della planimetria")
+      .setInputFiles(
+        path.resolve(
+          __dirname,
+          "../../frontend/tests/fixtures/plan-polyline.dwg",
+        ),
+      );
+    await window.getByLabel("Unità del disegno").waitFor({ timeout: 60000 });
+    await window.getByLabel("Unità del disegno").selectOption("1");
+    await window
+      .getByLabel("Ho controllato anteprima, unità e dimensioni")
+      .check();
+    await window
+      .getByRole("button", { name: "Usa questa planimetria" })
+      .click();
+    await window
+      .getByRole("status")
+      .filter({ hasText: "Planimetria importata" })
+      .waitFor();
     const fs = require("node:fs/promises");
     await fs.mkdir(path.resolve(__dirname, "../test-results"), {
       recursive: true,

@@ -2,8 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Stage, Layer, Line, Rect, Text, Group, Circle } from "react-konva";
 import type Konva from "konva";
-import Catalog, { type Entry } from "./catalog";
-import Kitchen from "./kitchen";
+import CadImport from "./cad";
 import {
   demo,
   finishOnly,
@@ -60,6 +59,7 @@ export default function Studio() {
   const [zoom, setZoom] = useState(1),
     [pan, setPan] = useState(false);
   const stage = useRef<Konva.Stage>(null);
+  const [importing, setImporting] = useState(false);
   useEffect(() => {
     api("/health")
       .then((h) => setDesktopMode(h.desktop === true))
@@ -99,6 +99,16 @@ export default function Studio() {
     setStatus("Modifiche da salvare");
   }
   function accept(q: Project) {
+    setZoom(
+      q.scene.reference
+        ? Math.min(
+            1,
+            620 / (q.scene.reference.width * S),
+            510 / (q.scene.reference.height * S),
+          )
+        : 1,
+    );
+    stage.current?.position({ x: 65, y: 70 });
     setP(q);
     setPast([]);
     setFuture([]);
@@ -125,7 +135,6 @@ export default function Studio() {
     if (!canLeave()) return;
     await run(async () => {
       accept(await api("/projects/" + id));
-      if (tab === "catalog" || tab === "kitchen") setTab("plan");
       setVersions(await api("/projects/" + id + "/versions"));
       setStatus("Progetto ricaricato dal database");
     });
@@ -207,76 +216,8 @@ export default function Studio() {
     });
     setSelected(id);
   }
-  function placeCatalog(e: Entry) {
-    if (!p) {
-      setStatus("Crea o apri un progetto prima di inserire un prodotto");
-      return;
-    }
-    const id = crypto.randomUUID();
-    edit((q) => {
-      q.scene.items.push({
-        id,
-        label: e.name + (e.isDemo ? " · DEMO" : ""),
-        x: 600,
-        y: 600,
-        width: e.width,
-        depth: e.depth,
-        height: e.height,
-        rotation: 0,
-        finish: e.color,
-        locked: false,
-        verification: e.isDemo ? "DEMO" : "verified",
-        catalogProduct: e,
-      });
-    });
-    setSelected(id);
-    setTab("plan");
-  }
-  function applyCatalogFinish(e: Entry) {
-    if (!item || item.locked) {
-      setStatus("Seleziona e sblocca un arredo prima di applicare la finitura");
-      return;
-    }
-    if (
-      !item.catalogProduct ||
-      e.manufacturerId !== item.catalogProduct.manufacturerId ||
-      !e.compatibleCodes.includes(item.catalogProduct.code)
-    ) {
-      setStatus("Compatibilità della finitura con il prodotto non documentata");
-      return;
-    }
-    updateItem({ finish: e.color, catalogFinish: e });
-    setTab("plan");
-  }
-  async function suggestCatalog() {
-    await run(async () => {
-      const data = await api("/catalog/suggestions", "POST");
-      const catalog: Entry[] = await api("/catalog");
-      edit((q) => {
-        q.scene.moodboards = data.directions.map(
-          (d: {
-            title: string;
-            palette: string[];
-            productIds: string[];
-            genericSuggestions: string[];
-            provenance: Record<string, unknown>;
-          }) => ({
-            id: crypto.randomUUID(),
-            title: d.title + " · DEMO",
-            palette: d.palette,
-            notes: d.genericSuggestions.join(" · "),
-            approved: false,
-            catalogReferences: catalog.filter((e) =>
-              d.productIds.includes(e.id),
-            ),
-            provenance: d.provenance,
-          }),
-        );
-      });
-      setStatus("Proposte DEMO dal catalogo: verifica e approva manualmente");
-    });
-  }
   function addOpening(kind: "door" | "window") {
+    if (!p || p.scene.walls.length < 3) return;
     const id = crypto.randomUUID();
     edit((q) => {
       q.scene.openings.push({
@@ -437,7 +378,11 @@ export default function Studio() {
         <div className="brand">
           ALBERTELLI<span>DESIGN STUDIO</span>
         </div>
-        <div className="demo-badge">{tab === "kitchen" ? "CATALOGO DELLO STUDIO" : "WORKSPACE DEMO"}</div>
+        <div className="demo-badge">
+          {p?.scene.reference
+            ? "PLANIMETRIA IMPORTATA"
+            : "STUDIO DI PROGETTAZIONE"}
+        </div>
         <button
           className="new"
           onClick={() => {
@@ -452,11 +397,8 @@ export default function Studio() {
         >
           ＋ Nuovo progetto cucina
         </button>
-        <button className="new" onClick={() => setTab("catalog")}>
-          Catalogo e materiali
-        </button>
-        <button className={"new" + (tab === "kitchen" ? " active" : "")} onClick={() => setTab("kitchen")}>
-          Albertelli Kitchen
+        <button className="new" onClick={() => setImporting(true)}>
+          Importa planimetria DWG / DXF
         </button>
         <p className="eyebrow">I TUOI PROGETTI</p>
         <nav>
@@ -525,21 +467,49 @@ export default function Studio() {
         </header>
         <div role="status" className="status">
           {status ||
-            (tab === "kitchen" ? "Albertelli Kitchen · catalogo e appunti privati dello studio" : "Dati DEMO · misure in millimetri · nessun servizio IA esterno")}
+            (p?.scene.reference
+              ? "Planimetria importata · misure in millimetri · riconoscimento IA da integrare"
+              : "Misure in millimetri · arredi di prova · nessun servizio IA esterno")}
         </div>
-        {tab === "kitchen" ? (
-          <Kitchen projectId={p?.id || ""} projectTitle={p?.title || ""} onBack={() => setTab("plan")} />
-        ) : tab === "catalog" ? (
-          <>
-            <button className="catalog-back" onClick={() => setTab("plan")}>
-              ← {p ? "Torna al progetto" : "Torna allo studio"}
-            </button>
-            <Catalog
-              onPlace={p ? placeCatalog : undefined}
-              onFinish={item ? applyCatalogFinish : undefined}
-            />
-          </>
-        ) : !p ? (
+        {importing && (
+          <CadImport
+            onClose={() => setImporting(false)}
+            onImport={(reference) => {
+              if (p)
+                edit((q) => {
+                  q.scene.reference = reference;
+                  q.scene.walls = [];
+                  q.scene.openings = [];
+                  q.scene.items = [];
+                });
+              else {
+                const q = demo();
+                q.title = reference.filename.replace(/\.(dwg|dxf)$/i, "");
+                q.scene.reference = reference;
+                q.scene.walls = [];
+                q.scene.openings = [];
+                q.scene.items = [];
+                accept(q);
+                setDirty(true);
+              }
+              setZoom(
+                Math.min(
+                  1,
+                  620 / (reference.width * S),
+                  510 / (reference.height * S),
+                ),
+              );
+              stage.current?.position({ x: 65, y: 70 });
+              setSelected("");
+              setTab("plan");
+              setImporting(false);
+              setStatus(
+                "Planimetria importata. Salva il progetto per conservarla.",
+              );
+            }}
+          />
+        )}
+        {!p ? (
           <section className="welcome">
             <span className="eyebrow">DALL’IDEA ALLO SPAZIO</span>
             <h2>
@@ -548,8 +518,8 @@ export default function Studio() {
               da una buona pianta.
             </h2>
             <p>
-              Crea una cucina, definisci le misure e scopri due direzioni di
-              stile.
+              Importa la planimetria DWG o DXF e prepara il progetto su cui
+              lavoreremo con l’IA.
             </p>
             <button
               className="primary"
@@ -584,8 +554,6 @@ export default function Studio() {
                 ["plan", "Pianta 2D"],
                 ["mood", "Moodboard"],
                 ["project", "Brief e versioni"],
-                ["catalog", "Catalogo"],
-                ["kitchen", "Albertelli Kitchen"],
               ].map(([key, label]) => (
                 <button
                   key={key}
@@ -605,14 +573,14 @@ export default function Studio() {
                     </b>
                     <div className="actions">
                       <button
-                        onClick={() => setZoom(Math.max(0.4, zoom - 0.2))}
+                        onClick={() => setZoom(Math.max(0.02, zoom * 0.8))}
                         aria-label="Riduci zoom"
                       >
                         −
                       </button>
                       <span>{Math.round(zoom * 100)}%</span>
                       <button
-                        onClick={() => setZoom(Math.min(2, zoom + 0.2))}
+                        onClick={() => setZoom(Math.min(4, zoom * 1.25))}
                         aria-label="Aumenta zoom"
                       >
                         ＋
@@ -622,6 +590,26 @@ export default function Studio() {
                         onClick={() => setPan(!pan)}
                       >
                         Sposta vista
+                      </button>
+                      <button onClick={() => setImporting(true)}>
+                        Importa DWG / DXF
+                      </button>
+                      <button
+                        onClick={() => {
+                          const r = p.scene.reference;
+                          setZoom(
+                            r
+                              ? Math.min(
+                                  1,
+                                  620 / (r.width * S),
+                                  510 / (r.height * S),
+                                )
+                              : 1,
+                          );
+                          stage.current?.position({ x: 65, y: 70 });
+                        }}
+                      >
+                        Inquadra pianta
                       </button>
                       <button onClick={exportPlan}>Esporta PNG</button>
                     </div>
@@ -662,6 +650,16 @@ export default function Studio() {
                               strokeWidth={0.5}
                             />
                           </Group>
+                        ))}
+                        {p.scene.reference?.paths.map((path, i) => (
+                          <Line
+                            key={"cad-" + i}
+                            points={path.points.map((v) => v * S)}
+                            stroke="#38564b"
+                            strokeWidth={1}
+                            strokeScaleEnabled={false}
+                            listening={false}
+                          />
                         ))}
                         <Line
                           points={p.scene.walls.flatMap((w) => [
@@ -793,7 +791,7 @@ export default function Studio() {
                         ))}
                         <Text
                           y={560}
-                          text={`DEMO · ${p.title} · revisione ${p.revision}${dirty ? " · modifiche non salvate" : ""}`}
+                          text={`${p.scene.reference ? "PLANIMETRIA IMPORTATA" : "DEMO"} · ${p.title} · revisione ${p.revision}${dirty ? " · modifiche non salvate" : ""}`}
                           fontSize={12}
                           fill="#536359"
                         />
@@ -807,6 +805,19 @@ export default function Studio() {
                 </section>
                 <aside className="inspector">
                   <h3>Il tuo ambiente</h3>
+                  {p.scene.reference && (
+                    <div className="cad-info">
+                      <b>{p.scene.reference.filename}</b>
+                      <p>
+                        {Math.round(p.scene.reference.width)} ×{" "}
+                        {Math.round(p.scene.reference.height)} mm
+                      </p>
+                      <p>
+                        Base 2D importata. Il riconoscimento IA di muri e
+                        aperture sarà il prossimo passaggio.
+                      </p>
+                    </div>
+                  )}
                   <p className="hint">
                     Misure canoniche in millimetri. Le aperture non valide
                     impediscono il salvataggio.
@@ -864,6 +875,7 @@ export default function Studio() {
                       </div>
                     ))}
                     <button
+                      disabled={p.scene.walls.length < 3}
                       onClick={() =>
                         edit((q) => {
                           const a = q.scene.walls[0],
@@ -881,8 +893,16 @@ export default function Studio() {
                   </details>
                   <h4>Aperture</h4>
                   <div className="pair">
-                    <button onClick={() => addOpening("door")}>＋ Porta</button>
-                    <button onClick={() => addOpening("window")}>
+                    <button
+                      disabled={p.scene.walls.length < 3}
+                      onClick={() => addOpening("door")}
+                    >
+                      ＋ Porta
+                    </button>
+                    <button
+                      disabled={p.scene.walls.length < 3}
+                      onClick={() => addOpening("window")}
+                    >
                       ＋ Finestra
                     </button>
                   </div>
@@ -895,7 +915,7 @@ export default function Studio() {
                       {o.kind === "door" ? "Porta" : "Finestra"} · {o.width} mm
                     </button>
                   ))}
-                  <h4>Catalogo dimostrativo</h4>
+                  <h4>Arredi di prova</h4>
                   <p className="hint">Volumi generici, senza marchio o SKU.</p>
                   {[
                     ["Base cucina", 600, 600, 870],
@@ -1118,18 +1138,6 @@ export default function Studio() {
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        "Sostituire le moodboard correnti con due proposte DEMO? Puoi annullare la modifica.",
-                      )
-                    )
-                      suggestCatalog();
-                  }}
-                >
-                  Proponi dal catalogo · DEMO
-                </button>
                 <div className="boards">
                   {p.scene.moodboards.map((b, index) => (
                     <article className="board" key={b.id}>

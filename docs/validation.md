@@ -1,3 +1,22 @@
+# Validazione 0.5.0 — planimetrie
+
+- 31 test API: persistenza CAD, coordinate e limiti; regressioni progetti e catalogo.
+- Build standalone Next e controllo TypeScript riusciti.
+- 7 test frontend riusciti: DWG reale, DXF in metri con origine negativa,
+  conversione assi, salvataggio/riapertura, annulla/ripristina, blocchi e archi,
+  chiusura catalogo e regressioni dello studio.
+- 4 test runtime desktop riusciti senza skip: payload nativo, browser, riavvio,
+  backup e ripristino.
+- Finestra Electron Linux verificata con lettura del vero DWG e importazione;
+  CSP dedicata al worker, senza abilitare eval nel renderer principale.
+- Il collaudo Windows installerà e avvierà il programma e importerà lo stesso
+  DWG anche nella finestra installata. Vedere lo stato della build Windows.
+
+Le prove usano un fixture CAD pubblico LibreDWG; non costituiscono una verifica
+di compatibilità con i DWG reali dello studio, che andranno provati.
+
+---
+
 # Verifiche — 21 ottobre 2026
 
 ## Risultati

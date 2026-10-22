@@ -34,10 +34,24 @@ export type Board = {
   catalogReferences?: CatalogSnapshot[];
   provenance?: Record<string, unknown>;
 };
+export type CadReference = {
+  filename: string;
+  sha256: string;
+  format: "dwg" | "dxf";
+  sourceUnit: string;
+  millimetersPerUnit: number;
+  width: number;
+  height: number;
+  originX: number;
+  originY: number;
+  paths: { layer: string; points: number[] }[];
+  warnings: string[];
+};
 export type Scene = {
   schemaVersion: "1.0";
   units: "mm";
   height: number;
+  reference?: CadReference;
   walls: Wall[];
   openings: Opening[];
   items: Item[];

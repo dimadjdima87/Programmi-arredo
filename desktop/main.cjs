@@ -79,7 +79,9 @@ async function start() {
     const headers = details.responseHeaders || {};
     if (new URL(details.url).origin === runtime.webUrl)
       headers["Content-Security-Policy"] = [
-        "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self' data:; object-src 'none'; frame-src 'none'; base-uri 'self'",
+        new URL(details.url).pathname === "/cad/worker.js"
+          ? "default-src 'none'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'; connect-src 'self';"
+          : "default-src 'self'; script-src 'self' 'unsafe-inline'; worker-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self' data:; object-src 'none'; frame-src 'none'; base-uri 'self'",
       ];
     callback({ responseHeaders: headers });
   });

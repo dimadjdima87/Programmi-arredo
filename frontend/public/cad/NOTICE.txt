@@ -1,0 +1,9 @@
+CAD reader: @mlightcad/libredwg-web 0.8.2, copyright MLight Lee and LibreDWG contributors, GPL-3.0.
+https://github.com/mlightcad/libredwg-web
+https://github.com/LibreDWG/libredwg
+The package includes the JavaScript wrapper and the WebAssembly build of LibreDWG.
+License: COPYING in this directory. The CAD worker and geometry adapter are also GPL-3.0-or-later.
+Corresponding reader source and build instructions:
+https://github.com/mlightcad/libredwg-web/tree/v0.8.2
+Application source including adapter:
+https://github.com/dimadjdima87/Programmi-arredo

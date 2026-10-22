@@ -1,8 +1,8 @@
 {
   "name": "albertelli-design-studio-desktop",
   "productName": "Albertelli Design Studio",
-  "version": "0.4.0",
-  "description": "Studio locale per progettazione di interni e catalogo Albertelli Kitchen",
+  "version": "0.5.0",
+  "description": "Studio locale per progettazione di interni e importazione planimetrie DWG e DXF",
   "author": "Albertelli Design Studio",
   "private": true,
   "main": "main.cjs",
