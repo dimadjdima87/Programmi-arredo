@@ -304,6 +304,9 @@ test(
             await page.getByRole("status").filter({ hasText: "Articolo salvato nei preferiti" }).waitFor();
             await page.getByRole("button", { name: "Preferiti", exact: true }).click();
             await page.locator(".k-pick").first().waitFor();
+            await page.locator(".k-pick .k-link").first().click();
+            await page.locator(".k-detail table").waitFor();
+            assert.match(await page.locator(".k-detail table").innerText(), /1\.?006/);
           } else {
             await page.getByRole("heading", { name: "Tutto il catalogo cucina in un solo spazio." }).waitFor();
           }

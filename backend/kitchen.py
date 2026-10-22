@@ -397,6 +397,26 @@ def register_kitchen(app, engine, user):
                 raise HTTPException(409, "Elenco aggiornato in un'altra finestra: ricarica prima di modificare")
         return {"revision": data.expectedRevision + 1}
 
+    @app.get("/api/kitchen/picks/{key}/reference")
+    def pick_reference(key: str, pageNumber: int | None = Query(default=None, ge=1, le=2000), u=Depends(user)):
+        with engine.connect() as c:
+            row = c.execute(text("SELECT snapshot FROM kitchen_picks WHERE id=:id AND owner_id=:uid"),
+                            {"id": key, "uid": u["id"]}).first()
+        if not row:
+            raise HTTPException(404, "Voce non trovata")
+        snapshot = json.loads(row[0])
+        source_page = None
+        try:
+            uri = location(u["id"], snapshot["datasetHash"]).resolve().as_uri() + "?mode=ro"
+            with closing(sqlite3.connect(uri, uri=True)) as db:
+                db.row_factory = sqlite3.Row
+                page_row = db.execute("SELECT page,category,reference,section,display_text FROM pages WHERE page=? AND kitchen=1",
+                                      (pageNumber or snapshot["page"],)).fetchone()
+                source_page = dict(page_row) if page_row else None
+        except sqlite3.DatabaseError:
+            pass  # Preserve and return the saved choice even if its index needs recovery.
+        return {"item": snapshot, "page": source_page}
+
     @app.delete("/api/kitchen/picks/{key}")
     def remove_pick(key: str, expectedRevision: int = Query(ge=1), u=Depends(user)):
         with engine.begin() as c:

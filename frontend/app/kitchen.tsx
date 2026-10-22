@@ -7,6 +7,7 @@ type KitchenItem = {
   id: string; code: string; codeKind?: string; rowLabel: string; variant?: string;
   supplementCode?: string; page: number; reference: string; section: string; category: string;
   numericStatus: string; groupKind: string; cells: Cell[]; context?: string;
+  datasetHash?: string;
   pricingRules?: { type: string; percent: string; basisReference: { page: number } }[];
 };
 type Category = { id: string; label: string; count: number; pages?: number };
@@ -58,6 +59,7 @@ export default function Kitchen({ projectId, projectTitle, onBack }: { projectId
   const [loading, setLoading] = useState(false), [selected, setSelected] = useState<KitchenItem | null>(null), [source, setSource] = useState<SourcePage | null>(null);
   const [picks, setPicks] = useState<Pick[]>([]), [change, setChange] = useState(0);
   const detailRequest = useRef(0);
+  const referencePick = useRef("");
 
   async function loadStatus() { setLibrary(await request<Library>("/status")); }
   useEffect(() => { loadStatus().catch(e => setMessage(e.message)); }, []);
@@ -112,6 +114,7 @@ export default function Kitchen({ projectId, projectTitle, onBack }: { projectId
   }
   async function openItem(id: string) {
     const version = ++detailRequest.current;
+    referencePick.current = "";
     try {
       const item = await request<KitchenItem>("/items/" + encodeURIComponent(id));
       if (version !== detailRequest.current) return;
@@ -120,12 +123,25 @@ export default function Kitchen({ projectId, projectTitle, onBack }: { projectId
       if (version === detailRequest.current) setSource(page);
     } catch (e) { if (version === detailRequest.current) setMessage(e instanceof Error ? e.message : "Articolo non disponibile"); }
   }
-  async function openPage(page: number) {
+  async function openPage(page: number, pickId = "") {
     const version = ++detailRequest.current;
     try {
-      const result = await request<SourcePage>("/pages/" + page);
-      if (version === detailRequest.current) { setSource(result); setSelected(null); }
+      const result = pickId ? (await request<{ page: SourcePage | null }>("/picks/" + pickId + "/reference?pageNumber=" + page)).page : await request<SourcePage>("/pages/" + page);
+      if (!result) throw new Error("Pagina non disponibile nel catalogo conservato");
+      if (version === detailRequest.current) { referencePick.current = pickId; setSource(result); setSelected(null); }
     } catch (e) { setMessage(e instanceof Error ? e.message : "Pagina non disponibile"); }
+  }
+  async function openPick(pick: Pick) {
+    const version = ++detailRequest.current;
+    referencePick.current = pick.id;
+    setSelected(pick.snapshot); setSource(null);
+    try {
+      const result = await request<{ item: KitchenItem; page: SourcePage | null }>("/picks/" + pick.id + "/reference");
+      if (version === detailRequest.current) {
+        setSelected(result.item); setSource(result.page);
+        if (!result.page) setMessage("La scelta salvata è conservata. Ricarica il suo pacchetto per consultare anche la pagina.");
+      }
+    } catch (e) { if (version === detailRequest.current) setMessage(e instanceof Error ? e.message : "Riferimento non disponibile"); }
   }
   async function addPick(project: string) {
     if (!selected) return;
@@ -173,7 +189,7 @@ export default function Kitchen({ projectId, projectTitle, onBack }: { projectId
           <div className="k-results" aria-label="Risultati del catalogo" aria-busy={loading}>
             {mode === "items" && items.map(r => <button className={"k-result" + (selected?.id === r.id ? " selected" : "")} key={r.id} onClick={() => void openItem(r.id)}><span className="k-result-code">{r.codeKind === "handle_number" ? "MANIGLIA " : "CODICE "}{r.code}</span><strong>{r.rowLabel || r.section}</strong><span>{r.variant && r.variant + " · "}{r.section}</span><small>Pagina {r.page} · {r.reference}</small><em>{labels[r.numericStatus]}</em></button>)}
             {mode === "pages" && pages.map(p => <button className="k-result" key={p.page} onClick={() => void openPage(p.page)}><span className="k-result-code">PAGINA {p.page}</span><strong>{p.section}</strong><small>{p.reference}</small></button>)}
-            {(mode === "favorites" || mode === "project") && picks.map(p => <PickEditor key={p.id + ":" + p.revision} pick={p} onSave={savePick} onRemove={removePick} onOpen={() => void openItem(p.snapshot.id)} />)}
+            {(mode === "favorites" || mode === "project") && picks.map(p => <PickEditor key={p.id + ":" + p.revision} pick={p} onSave={savePick} onRemove={removePick} onOpen={() => void openPick(p)} />)}
             {!loading && !total && <div className="k-no-results">{mode === "favorites" || mode === "project" ? "Scegli un articolo dal catalogo e aggiungilo a questo elenco." : "Nessun risultato. Prova un altro termine o cerca in Manuale e note."}</div>}
           </div>
           {(mode === "items" || mode === "pages") && <div className="k-pagination"><button disabled={offset === 0 || loading} onClick={() => setOffset(n => Math.max(0, n - 40))}>← Precedenti</button><span>{total ? offset + 1 : 0}–{Math.min(offset + 40, total)} di {total}</span><button disabled={offset + 40 >= total || loading} onClick={() => setOffset(n => n + 40)}>Successivi →</button></div>}
@@ -181,9 +197,9 @@ export default function Kitchen({ projectId, projectTitle, onBack }: { projectId
         <article className="k-detail" aria-label="Dettaglio del catalogo">
           {selected ? <><span className="eyebrow">{selected.codeKind === "handle_number" ? "MANIGLIA / POMELLO" : "ARTICOLO"}</span><h3>{selected.code}</h3><p>{selected.rowLabel}</p>{selected.variant && <p><b>Variante {selected.variant}</b></p>}{selected.supplementCode && <p>Codice supplemento: <b>{selected.supplementCode}</b></p>}<span className="k-verification">{labels[selected.numericStatus]}</span>
             {selected.cells.length > 0 && <div className="k-table-scroll"><table><thead><tr><th>{selected.groupKind === "price_group" ? "Gruppo prezzi" : selected.groupKind === "color_group" ? "Gruppo colori" : selected.groupKind === "surface" ? "Superficie" : "Voce"}</th><th>Punti</th></tr></thead><tbody>{selected.cells.map(c => <tr key={c.group}><td>{c.group === "single" ? "Articolo" : c.group}</td><td>{c.available === false ? "Non disponibile" : c.points !== null ? format(c.points) : c.raw || "Da verificare"}</td></tr>)}</tbody></table></div>}
-            {selected.pricingRules?.map((rule, i) => <p className="k-rule" key={i}>Maggiorazione <b>{rule.percent}%</b><br /><button className="k-link" onClick={() => void openPage(rule.basisReference.page)}>Condizioni a pagina {rule.basisReference.page}</button></p>)}
+            {selected.pricingRules?.map((rule, i) => <p className="k-rule" key={i}>Maggiorazione <b>{rule.percent}%</b><br /><button className="k-link" onClick={() => void openPage(rule.basisReference.page, referencePick.current)}>Condizioni a pagina {rule.basisReference.page}</button></p>)}
             {!selected.cells.length && !selected.pricingRules?.length && <p>I punti non sono indicati nella scheda estratta. Consulta le condizioni della pagina.</p>}
-            <div className="k-detail-actions"><button disabled={busy} onClick={() => void addPick("")}>Salva nei preferiti</button>{projectId && <button className="primary" disabled={busy} onClick={() => void addPick(projectId)}>Aggiungi agli articoli del progetto</button>}</div>
+            {selected.datasetHash && selected.datasetHash !== library.datasetHash ? <p className="k-note">Questa scelta appartiene a un catalogo conservato. Apri il catalogo corrente per aggiungere nuove voci.</p> : <div className="k-detail-actions"><button disabled={busy} onClick={() => void addPick("")}>Salva nei preferiti</button>{projectId && <button className="primary" disabled={busy} onClick={() => void addPick(projectId)}>Aggiungi agli articoli del progetto</button>}</div>}
             {projectTitle && !projectId && <p className="hint">Salva il progetto per raccogliere i suoi articoli.</p>}
             <p className="k-note">I punti sono valori del listino. Per utilizzare il pezzo verifica gruppo, dimensioni, finitura e note applicabili.</p>
           </> : source ? <><span className="eyebrow">MANUALE DI RIFERIMENTO</span><h3>{source.section}</h3></> : <><span className="eyebrow">DAL MANUALE AL PROGETTO</span><h3>Ogni scelta ha un riferimento.</h3><p>Apri una voce per confrontare le varianti e consultare la pagina del manuale.</p><p>I preferiti raccolgono gli articoli ricorrenti. L’elenco del progetto conserva quantità, note e dati della scelta.</p></>}

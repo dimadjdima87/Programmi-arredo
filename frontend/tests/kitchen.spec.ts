@@ -34,6 +34,9 @@ test("biblioteca cucina: importazione, ricerca, preferiti e articoli per progett
       const data = route.request().postDataJSON();
       const pick = { id: String(selected.length + 1), projectId: data.projectId, revision: 1, quantity: 1, note: "", snapshot: item };
       selected.push(pick); body = { id: pick.id, alreadyPresent: false };
+    } else if (path.endsWith("/reference") && method === "GET") {
+      const pick = selected.find(p => p.id === path.split("/")[2])!;
+      body = { item: pick.snapshot, page: { page: 200, reference: "M 3.6", section: "Basi", display_text: "Pagina conservata della scelta" } };
     } else if (path.startsWith("/picks/") && method === "PUT") {
       const data = route.request().postDataJSON(), pick = selected.find(p => p.id === path.split("/").pop())!;
       Object.assign(pick, data, { revision: pick.revision + 1 }); body = { revision: pick.revision };
@@ -70,6 +73,8 @@ test("biblioteca cucina: importazione, ricerca, preferiti e articoli per progett
   expect((await download).suggestedFilename()).toBe("Albertelli-Kitchen-Elenco.json");
   await k.getByRole("button", { name: "Preferiti", exact: true }).click();
   await expect(k.getByLabel("Quantità", { exact: true })).toHaveValue("1");
+  await k.locator(".k-pick .k-link").first().click();
+  await expect(k.locator("table")).toContainText("100");
   await k.getByRole("button", { name: "Rimuovi dall’elenco" }).click();
   await expect(k.locator(".k-pick")).toHaveCount(0);
   await k.getByRole("button", { name: "Manuale e note", exact: true }).click();

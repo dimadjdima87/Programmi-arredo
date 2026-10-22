@@ -167,6 +167,7 @@ def test_update_preserves_selection_snapshot_and_detects_conflicts(env, monkeypa
     client.post("/api/kitchen/picks", json={"occurrenceId": "p200-1"})
     data = fixture_data()
     data["rows"][0]["cells"][0]["points"] = "2000"
+    data["pages"][0]["text"] = "Nuova fonte aggiornata"
     revised, new_digest = package(data, monkeypatch)
     assert client.post("/api/kitchen/import?commit=true&expected=wrong", content=revised).status_code == 409
     assert client.get("/api/kitchen/status").json()["datasetHash"] == digest
@@ -174,6 +175,12 @@ def test_update_preserves_selection_snapshot_and_detects_conflicts(env, monkeypa
     assert client.get("/api/kitchen/status").json()["datasetHash"] == new_digest
     assert client.get("/api/kitchen/picks").json()[0]["snapshot"]["cells"][0]["points"] == "1006"
     assert client.get("/api/kitchen/items/p200-1").json()["cells"][0]["points"] == "2000"
+    saved = client.get("/api/kitchen/picks").json()[0]
+    reference = client.get("/api/kitchen/picks/" + saved["id"] + "/reference").json()
+    assert reference["item"]["cells"][0]["points"] == "1006"
+    assert "Nuova fonte aggiornata" not in reference["page"]["display_text"]
+    client.headers["x-user"] = "b"
+    assert client.get("/api/kitchen/picks/" + saved["id"] + "/reference").status_code == 404
 
 
 def test_missing_index_can_be_restored_without_removing_favorites(env):

@@ -33,7 +33,9 @@ articoli del progetto**. Nella scheda dedicata puoi salvare quantità e note,
 rimuovere una voce ed esportare l'elenco con i riferimenti originali.
 
 Le scelte conservano una copia dei dati del catalogo usati. Ricaricare il catalogo
-non cambia gli elenchi già salvati. Questi elenchi sono separati dalla geometria
+non cambia gli elenchi già salvati. Aprire una scelta mostra la copia conservata
+e le pagine della sua edizione, anche se il catalogo corrente è diverso.
+Questi elenchi sono separati dalla geometria
 e dal ripristino delle versioni della pianta. La selezione di un codice non
 inventa un ingombro e non inserisce automaticamente un mobile nella scena.
 Il calcolo del costo resta al passaggio successivo.
@@ -72,6 +74,8 @@ calcolo prezzi o posizionamento automatico.
 - `GET /api/kitchen/pages` e `/pages/{numero}`: ricerca e testo delle pagine cucina.
 - `GET/POST /api/kitchen/picks`: preferiti (`projectId` vuoto) o progetto proprio.
 - `PUT/DELETE /api/kitchen/picks/{id}`: quantità/note o rimozione con revisione.
+- `GET /api/kitchen/picks/{id}/reference`: scelta e pagina dell'edizione conservata,
+  con accesso limitato al proprietario; `pageNumber` apre altri rimandi della stessa fonte.
 
 Il proxy Next conserva query string, autenticazione, token desktop e controllo
 origine; il limite maggiore si applica solo all'importazione cucina. Il pacchetto
