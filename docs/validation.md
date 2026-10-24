@@ -9,7 +9,18 @@
 - 4 test runtime senza skip sul motore congelato: riconoscimento nativo,
   salvataggio, riavvio e recupero dal backup, oltre alle regressioni.
 - Finestra Electron Linux: DWG reale, riconoscimento locale, conferma e salvataggio.
-- Build Windows 0.6.0 da verificare prima della consegna dell’installer.
+- [Build Windows 0.6.0 riuscita](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/40086705994)
+  sul commit `2a7772c`: API native, payload, backup/ripristino, finestra Electron
+  e installazione NSIS riusciti. Il DWG reale viene importato, interpretato,
+  confermato e salvato anche nell’app installata. Artifact 144 MB.
+- Risolto il blocco di avvio Windows inizializzando le librerie native prima del
+  monitor del pipe ereditato e includendo i componenti necessari di Shapely
+  senza le sue suite di test. La diagnostica di avvio è attiva solo se
+  `STUDIO_DIAG_STARTUP=1`, usata nel collaudo CI del payload.
+- [CI generale sullo stesso commit riuscita](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/40086705946):
+  38 test su SQLite e PostgreSQL, build/typecheck e 8 test frontend.
+- Artifact id `12558025300`, digest SHA-256
+  `2aa8d646da22de3e92a3df390da382a22761448baf90f678d9434860cf8e7500`.
 
 I fixture sono pubblici o sintetici. Non è ancora stato misurato il risultato
 sui DWG reali dello studio. Il riconoscimento è geometrico, non un modello

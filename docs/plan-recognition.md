@@ -35,7 +35,7 @@ possibile integrazione successiva: il loro listino corrente non è stato verific
 - Finestre: geometria connessa sui livelli dedicati (`FINESTRE`, `WINDOW`, ecc.),
   prossima al muro. Senza questi livelli non viene assegnata arbitrariamente
   la classificazione finestra: può essere necessaria la correzione manuale.
-- Interruzioni di 250–1800 mm fra muri allineati possono diventare aperture
+- Interruzioni di 250–1500 mm fra muri allineati possono diventare aperture
   **da classificare**. Il muro ospitante è continuo; l’apertura rappresenta il vuoto.
 - Ambienti: facce chiuse fra assi dei muri, con sottrazione degli spessori.
   Superficie derivata dal contorno proposto, non rilievo certificato. Spazi
@@ -91,3 +91,9 @@ Il test intercetta la rete e fallisce se parte una richiesta esterna.
 riconoscimento, riavvio e ripristino del backup. La finestra Electron legge
 un DWG reale e salva anche il riconoscimento locale. I fixture sono pubblici
 o creati per i test, non sono planimetrie reali dei clienti dello studio.
+
+
+La build Windows 0.6.0 del commit `2a7772c` è stata compilata e installata con
+esito positivo: [download verificato](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/40086705994#artifacts).
+La finestra installata ha eseguito importazione DWG, riconoscimento, conferma e
+salvataggio. Le prove sui DWG dello studio restano il passo di verifica successivo.
