@@ -39,9 +39,14 @@ jobs:
             Get-Content windows-build.log -Tail 180 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
             '```' | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
             $tail = (Get-Content windows-build.log -Tail 120) -join "`n"
-            $message = $tail.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
-            Write-Output "::error title=Windows native build diagnostics::$message"
-          }
+            $tail = $tail -replace '\x1b\[[0-9;]*[A-Za-z]', ''
+            $tail = $tail.Substring([Math]::Max(0, $tail.Length - 8400))
+            for ($offset = 0; $offset -lt $tail.Length; $offset += 2800) {
+              $part = $tail.Substring($offset, [Math]::Min(2800, $tail.Length - $offset))
+              $message = $part.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+              Write-Output "::error title=Windows build detail $offset::$message"
+            }
+
       - name: Install Playwright browser
         working-directory: frontend
         run: npx playwright install chromium
