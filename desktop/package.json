@@ -1,7 +1,7 @@
 {
   "name": "albertelli-design-studio-desktop",
   "productName": "Albertelli Design Studio",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Studio locale per planimetrie DWG/DXF e riconoscimento geometrico di muri, aperture e ambienti",
   "author": "Albertelli Design Studio",
   "private": true,

@@ -1,8 +1,15 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
+import { moveWall, moveOpening, resizeWall } from "./recognition-drag";
 import {
   type CadReference,
   type Recognition,
+  type PlanPoint,
   type RecognizedRoom,
   openingPoints,
   roomArea,
@@ -90,6 +97,125 @@ export default function RecognizePlan({
     [past, setPast] = useState<Recognition[]>([]);
   const abort = useRef<AbortController | null>(null);
   const dialog = useRef<HTMLDialogElement | null>(null);
+  const svg = useRef<SVGSVGElement | null>(null);
+  const drag = useRef<{
+    pointerId: number;
+    id: string;
+    kind: "wall" | "opening" | "start" | "end";
+    base: Recognition;
+    result: Recognition;
+    start: PlanPoint;
+    clientX: number;
+    clientY: number;
+    checked: boolean;
+    moved: boolean;
+  } | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [movementHint, setMovementHint] = useState("");
+  function planPoint(event: ReactPointerEvent): PlanPoint | null {
+    const matrix = svg.current?.getScreenCTM();
+    if (!matrix) return null;
+    const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(
+      matrix.inverse(),
+    );
+    return { x: point.x, y: point.y };
+  }
+  function beginDrag(
+    event: ReactPointerEvent,
+    id: string,
+    kind: "wall" | "opening" | "start" | "end",
+  ) {
+    if (!draft || busy || event.button !== 0 || drag.current) return;
+    const point = planPoint(event);
+    if (!point) return;
+    event.preventDefault();
+    event.stopPropagation();
+    setSelected(id);
+    setSection(kind === "opening" ? "openings" : "walls");
+    svg.current?.setPointerCapture(event.pointerId);
+    drag.current = {
+      pointerId: event.pointerId,
+      id,
+      kind,
+      base: draft,
+      result: draft,
+      start: point,
+      clientX: event.clientX,
+      clientY: event.clientY,
+      checked,
+      moved: false,
+    };
+  }
+  function updateDrag(event: ReactPointerEvent) {
+    const gesture = drag.current;
+    if (!gesture || event.pointerId !== gesture.pointerId) return;
+    const point = planPoint(event);
+    if (!point) return;
+    if (
+      !gesture.moved &&
+      Math.hypot(
+        event.clientX - gesture.clientX,
+        event.clientY - gesture.clientY,
+      ) < 3
+    )
+      return;
+    gesture.moved = true;
+    setDragging(true);
+    event.preventDefault();
+    const delta = {
+      x: point.x - gesture.start.x,
+      y: point.y - gesture.start.y,
+    };
+    let result: Recognition;
+    if (gesture.kind === "wall")
+      result = moveWall(gesture.base, gesture.id, delta, reference);
+    else if (gesture.kind === "opening") {
+      const opening = gesture.base.openings.find((o) => o.id === gesture.id)!;
+      const points = openingPoints(opening, gesture.base.walls);
+      if (!points.length) return;
+      result = moveOpening(gesture.base, gesture.id, {
+        x: (points[0] + points[2]) / 2 + delta.x,
+        y: (points[1] + points[3]) / 2 + delta.y,
+      });
+    } else {
+      const w = gesture.base.walls.find((w) => w.id === gesture.id)!;
+      result = resizeWall(
+        gesture.base,
+        gesture.id,
+        gesture.kind,
+        { x: w[gesture.kind].x + delta.x, y: w[gesture.kind].y + delta.y },
+        reference,
+      );
+    }
+    gesture.result = result;
+    setDraft(result);
+    setChecked(false);
+    setMovementHint(
+      gesture.kind === "opening"
+        ? "L’apertura si aggancia al muro più vicino, senza sovrapporsi alle altre."
+        : "Dopo aver sistemato i muri, usa Ricalcola ambienti dai muri per aggiornare i contorni.",
+    );
+  }
+  function finishDrag(cancel = false) {
+    const gesture = drag.current;
+    if (!gesture) return;
+    drag.current = null;
+    setDragging(false);
+    if (svg.current?.hasPointerCapture(gesture.pointerId))
+      svg.current.releasePointerCapture(gesture.pointerId);
+    const changed =
+      gesture.moved &&
+      JSON.stringify(gesture.result) !== JSON.stringify(gesture.base);
+    if (cancel || !changed) {
+      setDraft(gesture.base);
+      setChecked(gesture.checked);
+      setMovementHint("");
+    } else {
+      setPast((p) => [...p, gesture.base].slice(-30));
+      setError("");
+    }
+  }
+
   useEffect(() => {
     const element = dialog.current;
     element?.showModal();
@@ -180,7 +306,7 @@ export default function RecognizePlan({
   const wall = draft?.walls.find((x) => x.id === selected),
     opening = draft?.openings.find((x) => x.id === selected),
     room = draft?.rooms.find((x) => x.id === selected);
-  function add() {
+  function add(openingKind: "door" | "window" | "unknown" = "unknown") {
     edit((q) => {
       const id = crypto.randomUUID(),
         w = reference.width,
@@ -200,7 +326,7 @@ export default function RecognizePlan({
         q.openings.push({
           id,
           wallId: host.id,
-          kind: "unknown",
+          kind: openingKind,
           offset: 0,
           width: Math.min(
             800,
@@ -241,6 +367,13 @@ export default function RecognizePlan({
       ref={dialog}
       className="recognition"
       aria-label="Riconoscimento della planimetria"
+      onKeyDownCapture={(e) => {
+        if (e.key === "Escape" && drag.current) {
+          e.preventDefault();
+          e.stopPropagation();
+          finishDrag(true);
+        }
+      }}
       onCancel={(e) => {
         e.preventDefault();
         close();
@@ -254,9 +387,9 @@ export default function RecognizePlan({
         <button onClick={close}>Chiudi revisione</button>
       </div>
       <p>
-        Analisi geometrica del CAD, senza modelli generativi né invio a servizi IA esterni.
-        Controlla le proposte sul disegno: gli elementi mancanti possono essere
-        aggiunti o corretti.
+        Analisi geometrica del CAD, senza modelli generativi né invio a servizi
+        IA esterni. Controlla le proposte sul disegno: gli elementi mancanti
+        possono essere aggiunti o corretti.
       </p>
       <details>
         <summary>Livelli dei muri · scelta facoltativa</summary>
@@ -337,8 +470,26 @@ export default function RecognizePlan({
             {draft.openings.filter((o) => o.kind === "unknown").length} ·
             Ambienti: {draft.rooms.length}
           </p>
+          <p className="hint">
+            Trascina un muro per spostarlo; trascina i due cerchi alle estremità
+            per allungarlo o ruotarlo. Porte e finestre si agganciano ai muri.
+          </p>
+          <p className="hint recognition-movement-hint" role="status">
+            {movementHint || " "}
+          </p>
           <div className="recognition-grid">
             <svg
+              ref={svg}
+              className={dragging ? "is-dragging" : ""}
+              onPointerMove={updateDrag}
+              onPointerUp={(e) => {
+                if (drag.current?.pointerId === e.pointerId) {
+                  updateDrag(e);
+                  finishDrag();
+                }
+              }}
+              onPointerCancel={() => finishDrag(true)}
+              onLostPointerCapture={() => finishDrag(true)}
               aria-label="Anteprima del riconoscimento"
               viewBox={`${-margin} ${-margin} ${reference.width + 2 * margin} ${reference.height + 2 * margin}`}
             >
@@ -369,20 +520,30 @@ export default function RecognizePlan({
                 />
               ))}
               {draft.walls.map((w) => (
-                <line
+                <g
                   key={w.id}
-                  x1={w.start.x}
-                  y1={w.start.y}
-                  x2={w.end.x}
-                  y2={w.end.y}
-                  stroke={selected === w.id ? "#f29233" : colors.wall}
-                  strokeOpacity=".65"
-                  strokeWidth={w.thickness}
-                  onClick={() => {
-                    setSelected(w.id);
-                    setSection("walls");
-                  }}
-                />
+                  data-wall-id={w.id}
+                  onPointerDown={(e) => beginDrag(e, w.id, "wall")}
+                >
+                  <line
+                    x1={w.start.x}
+                    y1={w.start.y}
+                    x2={w.end.x}
+                    y2={w.end.y}
+                    stroke={selected === w.id ? "#f29233" : colors.wall}
+                    strokeOpacity=".65"
+                    strokeWidth={w.thickness}
+                  />
+                  <line
+                    x1={w.start.x}
+                    y1={w.start.y}
+                    x2={w.end.x}
+                    y2={w.end.y}
+                    stroke="transparent"
+                    strokeWidth="14"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </g>
               ))}
               {draft.openings.map((o) => {
                 const p = openingPoints(o, draft.walls);
@@ -391,6 +552,8 @@ export default function RecognizePlan({
                 return (
                   <g
                     key={o.id}
+                    data-opening-id={o.id}
+                    onPointerDown={(e) => beginDrag(e, o.id, "opening")}
                     onClick={() => {
                       setSelected(o.id);
                       setSection("openings");
@@ -410,12 +573,41 @@ export default function RecognizePlan({
                       x2={p[2]}
                       y2={p[3]}
                       stroke={selected === o.id ? "#f29233" : colors[o.kind]}
-                      strokeWidth="5"
+                      strokeWidth="7"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                    <line
+                      x1={p[0]}
+                      y1={p[1]}
+                      x2={p[2]}
+                      y2={p[3]}
+                      stroke="transparent"
+                      strokeWidth="18"
                       vectorEffect="non-scaling-stroke"
                     />
                   </g>
                 );
               })}
+              {wall &&
+                (["start", "end"] as const).map((end) => (
+                  <circle
+                    key={end}
+                    data-handle={end}
+                    aria-label={
+                      end === "start"
+                        ? "Estremità iniziale del muro"
+                        : "Estremità finale del muro"
+                    }
+                    cx={wall[end].x}
+                    cy={wall[end].y}
+                    r={Math.max(reference.width, reference.height) * 0.012}
+                    fill="white"
+                    stroke="#f29233"
+                    strokeWidth="2"
+                    vectorEffect="non-scaling-stroke"
+                    onPointerDown={(e) => beginDrag(e, wall.id, end)}
+                  />
+                ))}
             </svg>
             <div className="recognition-edit" inert={busy}>
               <div className="tabs">
@@ -476,7 +668,7 @@ export default function RecognizePlan({
               </label>
               <button
                 disabled={section === "openings" && !draft.walls.length}
-                onClick={add}
+                onClick={() => add()}
               >
                 Aggiungi{" "}
                 {section === "walls"
@@ -485,6 +677,22 @@ export default function RecognizePlan({
                     ? "apertura"
                     : "ambiente"}
               </button>
+              {section === "openings" && (
+                <div className="actions">
+                  <button
+                    disabled={!draft.walls.length}
+                    onClick={() => add("door")}
+                  >
+                    Aggiungi porta
+                  </button>
+                  <button
+                    disabled={!draft.walls.length}
+                    onClick={() => add("window")}
+                  >
+                    Aggiungi finestra
+                  </button>
+                </div>
+              )}
               {wall && (
                 <>
                   <h3>Muro selezionato</h3>

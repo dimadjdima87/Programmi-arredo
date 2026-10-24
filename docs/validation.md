@@ -1,3 +1,18 @@
+# Validazione 0.7.0 — spostamento degli elementi riconosciuti
+
+- Build standalone Next e controllo TypeScript riusciti.
+- 13 test frontend passati. Il nuovo test grafico aggiunge e trascina un muro,
+  modifica un’estremità, aggancia una porta al nuovo muro e una finestra a un
+  altro muro; controlla Annulla, Esc, conferma, salvataggio e riapertura.
+- Le prove geometriche verificano limiti del disegno, apertura su muro verticale,
+  assenza di sovrapposizioni, conservazione delle larghezze, porte al seguito
+  del muro, accorciamenti non validi e immutabilità dello stato precedente.
+- Backend e schema non cambiano. I progetti 0.6.0 restano leggibili.
+- Il collaudo Windows deve verificare anche trascinamento di muro e finestra
+  nella finestra dell’app installata prima della consegna.
+
+---
+
 # Validazione 0.6.0 — riconoscimento geometrico locale
 
 - 38 test backend riusciti: geometrie ruotate, più ambienti, porta ad arco,

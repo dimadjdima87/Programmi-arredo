@@ -1,8 +1,10 @@
 # Albertelli Design Studio
 
-La versione **0.6.0** importa planimetrie DWG/DXF e propone **muri, porte,
+La versione **0.7.0** importa planimetrie DWG/DXF e propone **muri, porte,
 finestre e ambienti** con un riconoscimento geometrico locale. Il risultato
 si controlla e corregge sul disegno prima di salvarlo nel progetto.
+Muri, porte e finestre si possono aggiungere e trascinare; le estremità dei muri
+consentono di modificarne lunghezza e direzione.
 Non servono servizi esterni o costi API. La classificazione dipende dalla
 geometria e dai livelli CAD; aperture e destinazioni incerte restano da assegnare.
 Le sezioni catalogo rimangono chiuse; arredi generici e moodboard restano DEMO.
@@ -183,7 +185,7 @@ hosting, Python o Docker sul computer dell'utente finale. Progetti SQLite e
 campioni restano nel profilo Windows; menu per aprire i dati e creare backup.
 
 Guida e stato reale dell'installer: [docs/windows-desktop.md](docs/windows-desktop.md).
-La versione Windows **0.6.0** è stata compilata, installata e collaudata su Windows.
-[Scarica dalla build verificata](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/40086705994#artifacts):
-artifact `Albertelli-Design-Studio-Windows-x64` (144 MB). Estrarre lo ZIP e avviare
-`Albertelli-Design-Studio-Setup-0.6.0-x64.exe`.
+La versione Windows 0.7.0 aggiunge il posizionamento diretto degli elementi.
+[Stato compilazioni e download](https://github.com/dimadjdima87/Programmi-arredo/actions/workflows/windows-desktop.yml).
+Scaricare una build riuscita, artifact `Albertelli-Design-Studio-Windows-x64`,
+estrarre lo ZIP e avviare `Albertelli-Design-Studio-Setup-0.7.0-x64.exe`.

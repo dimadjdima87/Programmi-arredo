@@ -1,4 +1,4 @@
-# Applicazione desktop Windows — confezionamento 0.6.0
+# Applicazione desktop Windows — confezionamento 0.7.0
 
 ## Per chi userà il programma
 
@@ -11,6 +11,14 @@ né pagare un hosting. Ogni nuova compilazione va collaudata su Windows.
 Le funzioni locali comprendono pianta 2D con importazione DWG/DXF, versioni, moodboard
 DEMO e export. Le proposte IA restano il mock dichiarato: non richiedono rete.
 Integrazioni IA reali, sincronizzazione e progetti condivisi non sono inclusi.
+
+### Spostamento degli elementi (0.7.0)
+
+In **Rivedi muri e ambienti** trascinare muri, porte e finestre. I cerchi alle
+estremità modificano la lunghezza e la direzione del muro. Le aperture si
+agganciano ai muri e seguono il proprio muro quando viene spostato.
+Annulla correzione ripristina l’ultimo gesto; Esc annulla quello in corso.
+Confermare nel progetto e salvare. [Guida](plan-recognition.md).
 
 ### Riconoscimento locale (0.6.0)
 
@@ -110,13 +118,9 @@ installer e checksum SHA-256. Il workflow non pubblica una release automaticamen
 La build nativa, i test runtime/browser, la finestra Electron e l'installazione
 con avvio del programma installato sono riusciti.
 
-[Build Windows 0.6.0 verificata e download](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/40086705994#artifacts).
-Il commit `2a7772c` ha superato compilazione nativa, test del payload,
-backup/ripristino, finestra Electron e installazione NSIS. Il collaudo della
-finestra installata importa un DWG reale, avvia il riconoscimento locale,
-conferma e salva il risultato. Scaricare l’artifact
-`Albertelli-Design-Studio-Windows-x64` (144 MB), estrarre lo ZIP e avviare
-`Albertelli-Design-Studio-Setup-0.6.0-x64.exe`. Include SHA256.txt.
+[Stato compilazioni e download Windows](https://github.com/dimadjdima87/Programmi-arredo/actions/workflows/windows-desktop.yml).
+Usare una build 0.7.0 riuscita. Scaricare `Albertelli-Design-Studio-Windows-x64`,
+estrarre lo ZIP e avviare `Albertelli-Design-Studio-Setup-0.7.0-x64.exe`.
 
 ## Firma e distribuzione
 

@@ -1185,3 +1185,30 @@ fieldset {
     max-height: none;
   }
 }
+
+.recognition-grid svg {
+  touch-action: none;
+  user-select: none;
+}
+.recognition-grid svg [data-wall-id],
+.recognition-grid svg [data-opening-id] {
+  cursor: grab;
+}
+.recognition-grid svg [data-handle] {
+  cursor: crosshair;
+}
+.recognition-grid svg.is-dragging,
+.recognition-grid svg.is-dragging * {
+  cursor: grabbing;
+}
+
+.recognition-grid {
+  align-items: start;
+}
+.recognition-grid > svg {
+  height: min(65vh, 600px);
+}
+.recognition-movement-hint {
+  min-height: 3em;
+  margin: 8px 0;
+}

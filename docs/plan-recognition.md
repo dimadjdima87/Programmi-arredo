@@ -1,4 +1,4 @@
-# Riconoscimento locale della planimetria — 0.6.0
+# Riconoscimento locale della planimetria — 0.7.0
 
 ## Uso nello studio
 
@@ -17,6 +17,32 @@
    ambienti** consente ulteriori correzioni. Annulla/Ripristina dello studio
    recuperano l’intera modifica. Una nuova importazione elimina dal progetto
    aperto il riconoscimento precedente, che resta recuperabile con Annulla.
+
+## Spostare e completare gli elementi (0.7.0)
+
+Nella revisione si possono trascinare muri, porte e finestre direttamente
+sulla planimetria. Selezionare **Muri → Aggiungi muro**, oppure
+**Aperture → Aggiungi porta / Aggiungi finestra**, poi trascinare l’elemento
+arancione nella posizione desiderata.
+
+- Trascinando un muro lo si trasla entro il disegno; le aperture associate
+  mantengono muro, larghezza e distanza e lo seguono.
+- I due cerchi alle estremità del muro modificano lunghezza e direzione.
+  Un accorciamento che lascerebbe aperture fuori dal muro viene rifiutato.
+- Porte e finestre si agganciano al muro vicino e rimangono entro i suoi estremi.
+  Non vengono sovrapposte alle altre aperture dello stesso muro. Se manca
+  spazio la posizione viene limitata o il gesto non modifica l’elemento.
+  La larghezza non viene ridotta automaticamente.
+- Un gesto completo occupa un solo passo di **Annulla correzione**. **Esc**
+  durante il trascinamento annulla il gesto, lasciando aperta la revisione;
+  anche l’interruzione del puntatore ripristina lo stato iniziale.
+- Coordinate e misure numeriche restano modificabili per il posizionamento
+  preciso. Spostando muri o estremità occorre ricalcolare gli ambienti quando
+  si vogliono aggiornare i contorni; nomi e contorni non vengono sostituiti
+  automaticamente.
+
+Dopo le correzioni, confermare il controllo e usare **Conferma nel progetto →
+Salva progetto**. I progetti della versione precedente restano compatibili.
 
 ## Cosa riconosce
 
