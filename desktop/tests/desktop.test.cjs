@@ -417,6 +417,14 @@ test(
           .toString(),
         "PNG",
       );
+    } catch (error) {
+      for (const name of ["api", "web"]) {
+        try {
+          const log = await fs.readFile(path.join(dir, "logs", name + ".log"), "utf8");
+          console.error("NATIVE " + name + " LOG:\n" + log.slice(-5000));
+        } catch {}
+      }
+      throw error;
     } finally {
       await runtime.stop();
       if (restored) await restored.stop();

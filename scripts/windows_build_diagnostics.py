@@ -25,4 +25,5 @@ def report(path: Path):
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     report(Path(sys.argv[1] if len(sys.argv) > 1 else "windows-build.log"))
