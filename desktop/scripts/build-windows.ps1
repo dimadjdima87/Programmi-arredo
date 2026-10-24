@@ -24,10 +24,12 @@ npm.cmd --prefix desktop run stage
 Check-Exit
 $env:STUDIO_REQUIRE_PAYLOAD = '1'
 $env:STUDIO_TEST_ELECTRON_NODE = '1'
+$env:STUDIO_DIAG_STARTUP = '1'
 npm.cmd --prefix desktop test
 Check-Exit
 Remove-Item Env:STUDIO_REQUIRE_PAYLOAD
 Remove-Item Env:STUDIO_TEST_ELECTRON_NODE
+Remove-Item Env:STUDIO_DIAG_STARTUP
 npm.cmd --prefix desktop run dist:win
 Check-Exit
 Write-Output 'Installer generato nella cartella desktop/release. Eseguire il collaudo Windows prima della distribuzione.'

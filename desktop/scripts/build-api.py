@@ -15,6 +15,10 @@ subprocess.run([
     '--hidden-import', 'uvicorn.lifespan.on',
     '--hidden-import', 'uvicorn.loops.asyncio',
     '--collect-all', 'PIL',
-    '--collect-all', 'shapely',
+    '--collect-binaries', 'shapely',
+    '--copy-metadata', 'shapely',
+    '--hidden-import', 'shapely._geos',
+    '--hidden-import', 'shapely._geometry_helpers',
+    '--runtime-hook', str(root/'desktop'/'frozen_startup_diagnostics.py'),
     str(root/'desktop'/'api_entry.py')
 ], cwd=root, check=True)
