@@ -28,7 +28,17 @@ jobs:
             desktop/package-lock.json
       - name: Build native API, standalone web and installer
         shell: pwsh
-        run: ./desktop/scripts/build-windows.ps1
+        run: ./desktop/scripts/build-windows.ps1 *>&1 | Tee-Object -FilePath windows-build.log
+      - name: Publish build diagnostics
+        if: failure()
+        shell: pwsh
+        run: |
+          if (Test-Path windows-build.log) {
+            '### Windows build diagnostics' | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            '```text' | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            Get-Content windows-build.log -Tail 180 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            '```' | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          }
       - name: Install Playwright browser
         working-directory: frontend
         run: npx playwright install chromium
