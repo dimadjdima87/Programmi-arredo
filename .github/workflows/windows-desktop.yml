@@ -38,6 +38,9 @@ jobs:
             '```text' | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
             Get-Content windows-build.log -Tail 180 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
             '```' | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            $tail = (Get-Content windows-build.log -Tail 120) -join "`n"
+            $message = $tail.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Output "::error title=Windows native build diagnostics::$message"
           }
       - name: Install Playwright browser
         working-directory: frontend
