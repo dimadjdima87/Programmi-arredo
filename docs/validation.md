@@ -8,8 +8,15 @@
   assenza di sovrapposizioni, conservazione delle larghezze, porte al seguito
   del muro, accorciamenti non validi e immutabilità dello stato precedente.
 - Backend e schema non cambiano. I progetti 0.6.0 restano leggibili.
-- Il collaudo Windows deve verificare anche trascinamento di muro e finestra
-  nella finestra dell’app installata prima della consegna.
+- 4 test runtime desktop passati senza skip, più collaudo della finestra Electron.
+- [Build Windows 0.7.0 riuscita](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/40089810225)
+  sul commit `a5a5e46`: API native, payload, backup, finestra Electron e installazione.
+  La finestra installata importa DWG/DXF, trascina un nuovo muro, vi aggancia
+  una finestra, conferma e salva.
+- [CI generale riuscita](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/40089810223):
+  38 test backend su SQLite/PostgreSQL, build/typecheck e 13 test frontend.
+- Artifact 144 MB, id `12558292666`, digest SHA-256
+  `ce2e400e71d8f945a4ac43db8069d93c00e56fe96fac6637946010c8502d97dc`.
 
 ---
 

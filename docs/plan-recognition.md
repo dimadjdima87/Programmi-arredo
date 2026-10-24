@@ -123,3 +123,9 @@ La build Windows 0.6.0 del commit `2a7772c` è stata compilata e installata con
 esito positivo: [download verificato](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/40086705994#artifacts).
 La finestra installata ha eseguito importazione DWG, riconoscimento, conferma e
 salvataggio. Le prove sui DWG dello studio restano il passo di verifica successivo.
+
+
+La versione Windows 0.7.0 è stata compilata e installata con esito positivo:
+[download verificato](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/40089810225#artifacts).
+Il collaudo della finestra installata verifica anche il trascinamento di un
+muro aggiunto e l’aggancio di una nuova finestra, con conferma e salvataggio.

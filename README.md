@@ -185,7 +185,7 @@ hosting, Python o Docker sul computer dell'utente finale. Progetti SQLite e
 campioni restano nel profilo Windows; menu per aprire i dati e creare backup.
 
 Guida e stato reale dell'installer: [docs/windows-desktop.md](docs/windows-desktop.md).
-La versione Windows 0.7.0 aggiunge il posizionamento diretto degli elementi.
-[Stato compilazioni e download](https://github.com/dimadjdima87/Programmi-arredo/actions/workflows/windows-desktop.yml).
-Scaricare una build riuscita, artifact `Albertelli-Design-Studio-Windows-x64`,
-estrarre lo ZIP e avviare `Albertelli-Design-Studio-Setup-0.7.0-x64.exe`.
+La versione Windows **0.7.0** è stata compilata, installata e collaudata.
+[Scarica dalla build verificata](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/40089810225#artifacts):
+artifact `Albertelli-Design-Studio-Windows-x64` (144 MB). Estrarre lo ZIP e avviare
+`Albertelli-Design-Studio-Setup-0.7.0-x64.exe`.
