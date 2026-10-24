@@ -1,3 +1,22 @@
+# Validazione 0.6.0 — riconoscimento geometrico locale
+
+- 38 test backend riusciti: geometrie ruotate, più ambienti, porta ad arco,
+  finestra su livello dedicato, aperture da classificare, superfici, impronta
+  della fonte, conferma e salvataggio; regressioni delle funzioni precedenti.
+- Build standalone Next e controllo TypeScript riusciti; 8 test frontend passati.
+  Il nuovo test vieta richieste esterne e copre revisione, errore/correzione,
+  nome/destinazione dell’ambiente, conferma, undo/redo, riapertura e nuova fonte.
+- 4 test runtime senza skip sul motore congelato: riconoscimento nativo,
+  salvataggio, riavvio e recupero dal backup, oltre alle regressioni.
+- Finestra Electron Linux: DWG reale, riconoscimento locale, conferma e salvataggio.
+- Build Windows 0.6.0 da verificare prima della consegna dell’installer.
+
+I fixture sono pubblici o sintetici. Non è ancora stato misurato il risultato
+sui DWG reali dello studio. Il riconoscimento è geometrico, non un modello
+IA neurale/generativo; precisione e classificazioni richiedono controllo manuale.
+
+---
+
 # Validazione 0.5.0 — planimetrie
 
 - 31 test API: persistenza CAD, coordinate e limiti; regressioni progetti e catalogo.

@@ -14,6 +14,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy import create_engine, text
 from backend.catalog import register_catalog, validate_scene_catalog
 from backend.kitchen import register_kitchen
+from backend.plan_models import CadReference, Recognition
+from backend.recognition import register_recognition
 
 engine = create_engine(os.getenv("DATABASE_URL", "sqlite:///./studio.db"))
 app = FastAPI(title="Albertelli Design Studio — DEMO", version="0.2.0")
@@ -88,37 +90,6 @@ class Moodboard(Strict):
         return self
 
 
-class CadPath(Strict):
-    layer: str = Field(max_length=100)
-    points: list[float] = Field(min_length=4, max_length=20000)
-
-    @model_validator(mode="after")
-    def coordinates(self):
-        if len(self.points) % 2 or any(v < 0 or v > 50000 for v in self.points):
-            raise ValueError("Coordinate CAD non valide")
-        return self
-
-
-class CadReference(Strict):
-    filename: str = Field(min_length=1, max_length=255)
-    sha256: str = Field(pattern="^[a-f0-9]{64}$")
-    format: str = Field(pattern="^(dwg|dxf)$")
-    sourceUnit: str = Field(max_length=30)
-    millimetersPerUnit: float = Field(gt=0, le=1000000)
-    width: float = Field(gt=0, le=50000)
-    height: float = Field(gt=0, le=50000)
-    originX: float
-    originY: float
-    paths: list[CadPath] = Field(min_length=1, max_length=5000)
-    warnings: list[str] = Field(max_length=50)
-
-    @model_validator(mode="after")
-    def size(self):
-        if sum(len(p.points) for p in self.paths) > 120000:
-            raise ValueError("Planimetria troppo dettagliata")
-        if any(len(w) > 300 for w in self.warnings):
-            raise ValueError("Nota CAD troppo lunga")
-        return self
 
 
 class Scene(Strict):
@@ -126,6 +97,7 @@ class Scene(Strict):
     units: str = Field(default="mm", pattern="^mm$")
     height: float = Field(gt=0, le=6000)
     reference: CadReference | None = None
+    recognition: Recognition | None = None
     walls: list[Wall] = Field(max_length=100)
     openings: list[Opening] = Field(max_length=100)
     items: list[Item] = Field(max_length=500)
@@ -133,6 +105,10 @@ class Scene(Strict):
 
     @model_validator(mode="after")
     def geometry(self):
+        if self.recognition:
+            if not self.reference or not self.recognition.reviewed:
+                raise ValueError("Confermare il riconoscimento sulla planimetria prima di salvare")
+            self.recognition.validate_reference(self.reference)
         def fail(msg):
             raise ValueError(msg)
 
@@ -544,3 +520,4 @@ def restore(pid: str, revision: int, data: Restore, u=Depends(user)):
 
 register_catalog(app, engine, user)
 register_kitchen(app, engine, user)
+register_recognition(app, user)

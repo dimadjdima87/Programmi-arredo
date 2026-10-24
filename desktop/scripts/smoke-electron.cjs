@@ -75,8 +75,38 @@ const path = require("node:path");
       .getByRole("status")
       .filter({ hasText: "Planimetria importata" })
       .waitFor();
-    await window.getByRole("button", { name: "Salva progetto", exact: true }).click();
-    await window.getByRole("status").filter({ hasText: "Salvata revisione 1" }).waitFor();
+    await window
+      .getByRole("button", { name: "Salva progetto", exact: true })
+      .click();
+    await window
+      .getByRole("status")
+      .filter({ hasText: "Salvata revisione 1" })
+      .waitFor();
+    await window
+      .getByRole("button", { name: "Riconosci muri e ambienti", exact: true })
+      .click();
+    const recognition = window.getByRole("dialog", {
+      name: "Riconoscimento della planimetria",
+    });
+    await recognition
+      .getByRole("button", { name: "Avvia riconoscimento locale" })
+      .click();
+    await recognition.getByText("Muri:", { exact: false }).first().waitFor();
+    await recognition
+      .getByLabel(
+        "Ho controllato gli elementi proposti e le misure sulla planimetria",
+      )
+      .check();
+    await recognition
+      .getByRole("button", { name: "Conferma nel progetto" })
+      .click();
+    await window
+      .getByRole("button", { name: "Salva progetto", exact: true })
+      .click();
+    await window
+      .getByRole("status")
+      .filter({ hasText: "Salvata revisione 2" })
+      .waitFor();
     const fs = require("node:fs/promises");
     await fs.mkdir(path.resolve(__dirname, "../test-results"), {
       recursive: true,
@@ -93,13 +123,22 @@ const path = require("node:path");
     await app.evaluate(({ BrowserWindow }) => {
       for (const window of BrowserWindow.getAllWindows()) {
         window.webContents.removeAllListeners("will-prevent-unload");
-        window.webContents.on("will-prevent-unload", event => event.preventDefault());
+        window.webContents.on("will-prevent-unload", (event) =>
+          event.preventDefault(),
+        );
       }
     });
     await app.close();
   }
 })().catch((e) => {
   console.error(e);
-  if (process.env.GITHUB_ACTIONS) console.log("::error::" + String(e.message || e).replaceAll("%", "%25").replaceAll("\r", "%0D").replaceAll("\n", "%0A"));
+  if (process.env.GITHUB_ACTIONS)
+    console.log(
+      "::error::" +
+        String(e.message || e)
+          .replaceAll("%", "%25")
+          .replaceAll("\r", "%0D")
+          .replaceAll("\n", "%0A"),
+    );
   process.exitCode = 1;
 });

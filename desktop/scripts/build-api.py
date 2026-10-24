@@ -15,5 +15,6 @@ subprocess.run([
     '--hidden-import', 'uvicorn.lifespan.on',
     '--hidden-import', 'uvicorn.loops.asyncio',
     '--collect-all', 'PIL',
+    '--collect-all', 'shapely',
     str(root/'desktop'/'api_entry.py')
 ], cwd=root, check=True)

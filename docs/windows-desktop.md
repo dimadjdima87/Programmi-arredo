@@ -1,4 +1,4 @@
-# Applicazione desktop Windows — confezionamento 0.5.0
+# Applicazione desktop Windows — confezionamento 0.6.0
 
 ## Per chi userà il programma
 
@@ -12,12 +12,19 @@ Le funzioni locali comprendono pianta 2D con importazione DWG/DXF, versioni, moo
 DEMO e export. Le proposte IA restano il mock dichiarato: non richiedono rete.
 Integrazioni IA reali, sincronizzazione e progetti condivisi non sono inclusi.
 
+### Riconoscimento locale (0.6.0)
+
+Dopo l’importazione usare **Riconosci muri e ambienti**. Controllare e correggere
+la bozza, confermare nel progetto e salvare. Il motore geometrico è incluso
+nell’installer, non richiede Internet o costi API.
+[Funzionamento, revisione e limiti](plan-recognition.md).
+
 ### Planimetria DWG / DXF (0.5.0)
 
 Usare **Importa planimetria DWG / DXF**, scegliere il file e confermare unità,
 anteprima e misure. L’importazione è locale e resta disponibile senza rete.
 Il catalogo è chiuso nell’interfaccia; i dati precedenti vengono conservati.
-[Istruzioni e limiti](cad-import.md). Il riconoscimento IA è il passaggio successivo.
+[Istruzioni e limiti](cad-import.md). Il riconoscimento geometrico locale è disponibile dalla versione 0.6.0.
 
 ### Accesso e uscita
 
@@ -103,12 +110,10 @@ installer e checksum SHA-256. Il workflow non pubblica una release automaticamen
 La build nativa, i test runtime/browser, la finestra Electron e l'installazione
 con avvio del programma installato sono riusciti.
 
-[Build Windows 0.5.0 riuscita e download](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39837355594#artifacts).
-La build del commit `327142b` è stata compilata, installata e avviata su Windows;
-il test ha importato e salvato un DWG reale sia nella finestra non confezionata,
-sia nell’app installata. Scaricare `Albertelli-Design-Studio-Windows-x64`,
-estrarre lo ZIP e avviare `Albertelli-Design-Studio-Setup-0.5.0-x64.exe`.
-L’artifact contiene SHA256.txt.
+[Stato compilazioni e download Windows](https://github.com/dimadjdima87/Programmi-arredo/actions/workflows/windows-desktop.yml).
+Usare una build 0.6.0 completata con successo. Scaricare
+`Albertelli-Design-Studio-Windows-x64`, estrarre lo ZIP e avviare
+`Albertelli-Design-Studio-Setup-0.6.0-x64.exe`. L’artifact contiene SHA256.txt.
 
 ## Firma e distribuzione
 

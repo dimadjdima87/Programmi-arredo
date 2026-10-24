@@ -1,13 +1,14 @@
 # Albertelli Design Studio
 
-La versione 0.5.0 sposta il lavoro sulla planimetria: importa un **DWG o DXF**,
-controlla anteprima, unità e livelli, quindi salva la base 2D nel progetto.
-Il file viene letto localmente, anche senza Internet nella versione Windows.
-Le sezioni catalogo sono state chiuse su richiesta dello studio; i dati già
-salvati restano conservati. L’IA per riconoscere ambienti e aperture sarà un
-passaggio successivo. Gli arredi generici e le moodboard restano dimostrativi.
+La versione **0.6.0** importa planimetrie DWG/DXF e propone **muri, porte,
+finestre e ambienti** con un riconoscimento geometrico locale. Il risultato
+si controlla e corregge sul disegno prima di salvarlo nel progetto.
+Non servono servizi esterni o costi API. La classificazione dipende dalla
+geometria e dai livelli CAD; aperture e destinazioni incerte restano da assegnare.
+Le sezioni catalogo rimangono chiuse; arredi generici e moodboard restano DEMO.
 
-[Guida all’importazione della planimetria](docs/cad-import.md).
+[Importare DWG/DXF](docs/cad-import.md) ·
+[Riconoscimento locale e revisione](docs/plan-recognition.md).
 
 ## Struttura
 
@@ -182,9 +183,7 @@ hosting, Python o Docker sul computer dell'utente finale. Progetti SQLite e
 campioni restano nel profilo Windows; menu per aprire i dati e creare backup.
 
 Guida e stato reale dell'installer: [docs/windows-desktop.md](docs/windows-desktop.md).
-La versione Windows **0.5.0** è stata compilata, installata e collaudata con un DWG reale.
-[Scarica dalla build verificata](https://github.com/dimadjdima87/Programmi-arredo/actions/runs/39837355594#artifacts):
-scaricare `Albertelli-Design-Studio-Windows-x64`, estrarre lo ZIP e avviare
-`Albertelli-Design-Studio-Setup-0.5.0-x64.exe`.
-Prototipo senza firma editore. La pubblicazione dell’ambiente cloud è distinta
-dalla compilazione e consegna del programma Windows.
+La versione Windows 0.6.0 include il motore geometrico nell’installer.
+[Stato compilazioni e download Windows](https://github.com/dimadjdima87/Programmi-arredo/actions/workflows/windows-desktop.yml).
+Scaricare una build riuscita, artifact `Albertelli-Design-Studio-Windows-x64`,
+estrarre lo ZIP e avviare `Albertelli-Design-Studio-Setup-0.6.0-x64.exe`.

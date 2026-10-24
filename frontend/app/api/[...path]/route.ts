@@ -34,8 +34,13 @@ async function proxy(
   try {
     let body: Uint8Array | undefined;
     if (!["GET", "HEAD"].includes(request.method) && request.body) {
-      const libraryImport = path.length === 2 && path[0] === "kitchen" && path[1] === "import";
-      const limit = libraryImport ? 20 * 1024 * 1024 : path.includes("swatch") ? 2 * 1024 * 1024 : 5 * 1024 * 1024;
+      const libraryImport =
+        path.length === 2 && path[0] === "kitchen" && path[1] === "import";
+      const limit = libraryImport
+        ? 20 * 1024 * 1024
+        : path.includes("swatch")
+          ? 2 * 1024 * 1024
+          : 5 * 1024 * 1024;
       const reader = request.body.getReader();
       const chunks: Uint8Array[] = [];
       let total = 0;
@@ -66,7 +71,11 @@ async function proxy(
         headers,
         body: body as BodyInit | undefined,
         cache: "no-store",
-        signal: AbortSignal.timeout(path[0] === "kitchen" && path[1] === "import" ? 60000 : 15000),
+        signal: AbortSignal.timeout(
+          (path[0] === "kitchen" && path[1] === "import") || path[0] === "plan"
+            ? 60000
+            : 15000,
+        ),
       },
     );
     const outgoing = new Headers({

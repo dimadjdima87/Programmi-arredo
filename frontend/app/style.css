@@ -1116,3 +1116,72 @@ fieldset {
   border-bottom: 1px solid #d8ded5;
   margin-bottom: 14px;
 }
+
+.recognition {
+  width: min(1400px, calc(100vw - 48px));
+  max-height: 92vh;
+  overflow: auto;
+  border: 1px solid #9aa99c;
+  border-radius: 14px;
+  background: #f7f6f1;
+  padding: 24px;
+  color: #243d34;
+}
+.recognition::backdrop {
+  background: #12271cb0;
+}
+.recognition > .actions {
+  justify-content: space-between;
+}
+.recognition-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 22px;
+  margin: 16px 0;
+}
+.recognition-grid svg {
+  background: #fffefa;
+  width: 100%;
+  min-height: 360px;
+  max-height: 65vh;
+  border: 1px solid #d8ded5;
+}
+.recognition-grid svg line,
+.recognition-grid svg polygon {
+  cursor: pointer;
+}
+.recognition-edit {
+  max-height: 68vh;
+  overflow: auto;
+  padding-right: 8px;
+}
+.recognition label {
+  display: block;
+  margin: 10px 0;
+}
+.recognition input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+}
+.recognition select {
+  width: 100%;
+  padding: 9px;
+  background: white;
+  border: 1px solid #d8ded5;
+  border-radius: 6px;
+}
+.recognition-error {
+  color: #9e3025;
+}
+.recognition-legend {
+  padding: 12px;
+  background: #eceee7;
+}
+@media (max-width: 1000px) {
+  .recognition-grid {
+    grid-template-columns: 1fr;
+  }
+  .recognition-edit {
+    max-height: none;
+  }
+}

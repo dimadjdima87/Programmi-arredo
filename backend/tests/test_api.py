@@ -489,3 +489,41 @@ def test_cad_reference_roundtrip_and_validation(client, payload):
     assert client.post("/api/projects", json=payload).status_code == 422
     payload["scene"].pop("reference")
     assert client.post("/api/projects", json=payload).status_code == 422
+
+
+def test_local_recognition_review_persist_and_stale_source(client, payload):
+    ref=dict(filename="plan.dwg",sha256="a"*64,format="dwg",sourceUnit="Millimetri",millimetersPerUnit=1,
+             width=4200,height=3600,originX=0,originY=3600,warnings=[],
+             paths=[dict(layer="MURI",points=[0,0,4200,0,4200,3600,0,3600,0,0])])
+    response=client.post('/api/plan/recognize',json={'reference':ref})
+    assert response.status_code==200,response.text
+    result=response.json()
+    assert len(result['walls'])==4 and len(result['rooms'])==1
+    payload['scene'].update(reference=ref,recognition=result,walls=[],openings=[])
+    assert client.post('/api/projects',json=payload).status_code==422
+    result['reviewed']=True
+    assert client.post('/api/plan/validate',json={'reference':ref,'recognition':result}).status_code==200
+    saved=client.post('/api/projects',json=payload)
+    assert saved.status_code==201,saved.text
+    project=client.get('/api/projects/'+saved.json()['id']).json()
+    assert project['scene']['recognition']==result
+    ref['paths'][0]['points'][0]=10
+    assert client.post('/api/plan/validate',json={'reference':ref,'recognition':result}).status_code==422
+    assert client.post('/api/projects',json=payload).status_code==422
+    client.post('/api/logout')
+    assert client.post('/api/plan/recognize',json={'reference':ref}).status_code==401
+
+
+def test_recognition_invalid_opening_and_room_recompute(client):
+    ref=dict(filename="plan.dwg",sha256="a"*64,format="dwg",sourceUnit="Millimetri",millimetersPerUnit=1,
+             width=4200,height=3600,originX=0,originY=3600,warnings=[],
+             paths=[dict(layer="MURI",points=[0,0,4200,0,4200,3600,0,3600,0,0])])
+    result=client.post('/api/plan/recognize',json={'reference':ref}).json()
+    result['openings']=[dict(id='opening',wallId=result['walls'][0]['id'],kind='window',offset=4000,width=800,evidence='Manuale',certainty='manual')]
+    assert client.post('/api/plan/validate',json={'reference':ref,'recognition':result}).status_code==422
+    result['openings']=[]
+    result['walls'][0]['thickness']=400
+    rooms=client.post('/api/plan/rooms',json={'reference':ref,'recognition':result})
+    assert rooms.status_code==200,rooms.text
+    assert rooms.json()['rooms'][0]['points']!=result['rooms'][0]['points']
+    assert rooms.json()['reviewed'] is False

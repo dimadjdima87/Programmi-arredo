@@ -154,6 +154,32 @@ test(
           },
         ],
       };
+      scene.reference = {
+        filename: "apartment.dxf",
+        sha256: "a".repeat(64),
+        format: "dxf",
+        sourceUnit: "Millimetri",
+        millimetersPerUnit: 1,
+        width: 4200,
+        height: 3600,
+        originX: 0,
+        originY: 3600,
+        warnings: [],
+        paths: [
+          { layer: "MURI", points: [0, 0, 4200, 0, 4200, 3600, 0, 3600, 0, 0] },
+        ],
+      };
+      const interpreted = await req(runtime, "/api/plan/recognize", {
+        method: "POST",
+        cookie,
+        data: { reference: scene.reference },
+      });
+      assert.equal(interpreted.status, 200, await interpreted.clone().text());
+      scene.recognition = await interpreted.json();
+      assert.equal(scene.recognition.walls.length, 4);
+      assert.equal(scene.recognition.rooms.length, 1);
+      scene.recognition.reviewed = true;
+      scene.walls = [];
       const project = await (
         await req(runtime, "/api/projects", {
           method: "POST",
@@ -220,26 +246,48 @@ test(
       // acceptance testing. Public CI never receives the studio's data.
       let kitchenPick;
       if (process.env.STUDIO_KITCHEN_PACKAGE) {
-        const packageBytes = await fs.readFile(process.env.STUDIO_KITCHEN_PACKAGE);
+        const packageBytes = await fs.readFile(
+          process.env.STUDIO_KITCHEN_PACKAGE,
+        );
         for (const commit of [false, true]) {
-          const imported = await fetch(runtime.webUrl + "/api/kitchen/import?commit=" + commit, {
-            method: "POST", headers: { "x-studio-desktop-ui": runtime.uiToken, Cookie: cookie,
-              "Content-Type": "application/zip" }, body: packageBytes,
-          });
+          const imported = await fetch(
+            runtime.webUrl + "/api/kitchen/import?commit=" + commit,
+            {
+              method: "POST",
+              headers: {
+                "x-studio-desktop-ui": runtime.uiToken,
+                Cookie: cookie,
+                "Content-Type": "application/zip",
+              },
+              body: packageBytes,
+            },
+          );
           assert.equal(imported.status, 200, await imported.clone().text());
           assert.equal((await imported.json()).articleOccurrences, 8870);
         }
-        const found = await (await req(runtime, "/api/kitchen/items?q=21008", { cookie })).json();
+        const found = await (
+          await req(runtime, "/api/kitchen/items?q=21008", { cookie })
+        ).json();
         assert.equal(found.items[0].code, "21008");
         assert.equal(found.items[0].cells[0].points, "1006");
         assert.equal(found.items[0].cells[7].available, false);
-        const sourcePage = await (await req(runtime, "/api/kitchen/pages/295", { cookie })).json();
+        const sourcePage = await (
+          await req(runtime, "/api/kitchen/pages/295", { cookie })
+        ).json();
         assert.match(sourcePage.display_text, /100 mm/);
         assert.doesNotMatch(sourcePage.display_text, /nobilia/i);
-        kitchenPick = await (await req(runtime, "/api/kitchen/picks", { cookie,
-          method: "POST", data: { occurrenceId: found.items[0].id, projectId: project.id } })).json();
-        await req(runtime, "/api/kitchen/picks/" + kitchenPick.id, { cookie, method: "PUT",
-          data: { expectedRevision: 1, quantity: 3, note: "Verifica finitura" } });
+        kitchenPick = await (
+          await req(runtime, "/api/kitchen/picks", {
+            cookie,
+            method: "POST",
+            data: { occurrenceId: found.items[0].id, projectId: project.id },
+          })
+        ).json();
+        await req(runtime, "/api/kitchen/picks/" + kitchenPick.id, {
+          cookie,
+          method: "PUT",
+          data: { expectedRevision: 1, quantity: 3, note: "Verifica finitura" },
+        });
       }
       if (process.env.DESKTOP_BROWSER_TEST === "1") {
         const { chromium } = require("../../frontend/node_modules/playwright");
@@ -291,9 +339,18 @@ test(
             .getByRole("button", { name: "Rientra nello studio", exact: false })
             .click();
           await page.getByRole("button", { name: /Cucina desktop/ }).waitFor();
-          assert.equal(await page.getByRole("button", { name: "Albertelli Kitchen", exact: true }).count(), 0);
-          await page.getByRole("button", { name: "Importa planimetria DWG / DXF" }).click();
-          await page.getByRole("heading", { name: "Importa la planimetria" }).waitFor();
+          assert.equal(
+            await page
+              .getByRole("button", { name: "Albertelli Kitchen", exact: true })
+              .count(),
+            0,
+          );
+          await page
+            .getByRole("button", { name: "Importa planimetria DWG / DXF" })
+            .click();
+          await page
+            .getByRole("heading", { name: "Importa la planimetria" })
+            .waitFor();
           await fs.mkdir(path.resolve(__dirname, "../test-results"), {
             recursive: true,
           });
@@ -318,7 +375,9 @@ test(
       ).json();
       assert.deepEqual(saved.scene, scene);
       if (kitchenPick) {
-        const state = await (await req(runtime, "/api/kitchen/status", { cookie: c })).json();
+        const state = await (
+          await req(runtime, "/api/kitchen/status", { cookie: c })
+        ).json();
         assert.equal(state.articleOccurrences, 8870);
       }
       await runtime.stop();
@@ -336,11 +395,17 @@ test(
       ).json();
       assert.deepEqual(saved.scene, scene);
       if (kitchenPick) {
-        const choices = await (await req(restored, "/api/kitchen/picks?projectId=" + project.id, { cookie: c })).json();
+        const choices = await (
+          await req(restored, "/api/kitchen/picks?projectId=" + project.id, {
+            cookie: c,
+          })
+        ).json();
         assert.equal(choices[0].quantity, 3);
         assert.equal(choices[0].note, "Verifica finitura");
         assert.equal(choices[0].snapshot.cells[0].points, "1006");
-        const found = await (await req(restored, "/api/kitchen/items?q=21008", { cookie: c })).json();
+        const found = await (
+          await req(restored, "/api/kitchen/items?q=21008", { cookie: c })
+        ).json();
         assert.equal(found.items[0].code, "21008");
       }
       const swatch = await req(restored, `/api/catalog/${finish.id}/swatch`, {

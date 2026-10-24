@@ -91,7 +91,7 @@ test("DXF: scala, salvataggio, riapertura e annullamento", async ({ page }) => {
   await page.getByRole("button", { name: "Ripristina", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "＋ Porta", exact: true }),
-  ).toBeDisabled();
+  ).toHaveCount(0);
   const title = "Pianta CAD " + Date.now();
   await page
     .getByRole("button", { name: "Brief e versioni", exact: true })

@@ -47,11 +47,80 @@ export type CadReference = {
   paths: { layer: string; points: number[] }[];
   warnings: string[];
 };
+export type PlanPoint = { x: number; y: number };
+export type RecognizedWall = {
+  id: string;
+  start: PlanPoint;
+  end: PlanPoint;
+  thickness: number;
+  evidence: string;
+  certainty: "strong" | "possible" | "manual";
+};
+export type RecognizedOpening = {
+  id: string;
+  wallId: string;
+  kind: "door" | "window" | "unknown";
+  offset: number;
+  width: number;
+  evidence: string;
+  certainty: "strong" | "possible" | "manual";
+};
+export type RecognizedRoom = {
+  id: string;
+  name: string;
+  kind:
+    | "unknown"
+    | "kitchen"
+    | "living"
+    | "bedroom"
+    | "bathroom"
+    | "circulation"
+    | "other";
+  points: PlanPoint[];
+  evidence: string;
+};
+export type Recognition = {
+  engine: "cad-geometry-v1";
+  referenceFingerprint: string;
+  reviewed: boolean;
+  walls: RecognizedWall[];
+  openings: RecognizedOpening[];
+  rooms: RecognizedRoom[];
+  warnings: string[];
+};
+export function openingPoints(
+  o: RecognizedOpening,
+  walls: RecognizedWall[],
+): number[] {
+  const w = walls.find((w) => w.id === o.wallId);
+  if (!w) return [];
+  const length = Math.hypot(w.end.x - w.start.x, w.end.y - w.start.y);
+  if (!length) return [];
+  const dx = (w.end.x - w.start.x) / length,
+    dy = (w.end.y - w.start.y) / length;
+  return [
+    w.start.x + dx * o.offset,
+    w.start.y + dy * o.offset,
+    w.start.x + dx * (o.offset + o.width),
+    w.start.y + dy * (o.offset + o.width),
+  ];
+}
+export function roomArea(room: RecognizedRoom): number {
+  return (
+    Math.abs(
+      room.points.reduce((n, p, i) => {
+        const q = room.points[(i + 1) % room.points.length];
+        return n + p.x * q.y - q.x * p.y;
+      }, 0),
+    ) / 2000000
+  );
+}
 export type Scene = {
   schemaVersion: "1.0";
   units: "mm";
   height: number;
   reference?: CadReference;
+  recognition?: Recognition;
   walls: Wall[];
   openings: Opening[];
   items: Item[];

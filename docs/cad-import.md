@@ -1,4 +1,4 @@
-# Planimetrie DWG / DXF — 0.5.0
+# Planimetrie DWG / DXF — importazione dalla 0.5.0
 
 ## Uso
 
@@ -14,7 +14,8 @@ L’importazione sostituisce muri, aperture e arredi correnti. Annulla/Ripristin
 consentono di recuperare lo stato precedente prima del salvataggio.
 Non viene inventato un perimetro rettangolare intorno alla pianta.
 La geometria CAD è una base 2D: non rappresenta ancora muri, stanze o aperture
-riconosciuti. Il riconoscimento IA e la progettazione assistita sono successivi.
+riconosciuti. Dalla 0.6.0 è disponibile il [riconoscimento geometrico locale](plan-recognition.md),
+con revisione prima della conferma. Una IA generativa è un’integrazione successiva.
 
 ## Lettura e limiti
 

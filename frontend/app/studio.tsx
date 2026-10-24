@@ -3,9 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { Stage, Layer, Line, Rect, Text, Group, Circle } from "react-konva";
 import type Konva from "konva";
 import CadImport from "./cad";
+import RecognizePlan from "./recognition";
 import {
   demo,
   finishOnly,
+  openingPoints,
+  roomArea,
   type Project,
   type Item,
   type Opening,
@@ -60,6 +63,7 @@ export default function Studio() {
     [pan, setPan] = useState(false);
   const stage = useRef<Konva.Stage>(null);
   const [importing, setImporting] = useState(false);
+  const [recognizing, setRecognizing] = useState(false);
   useEffect(() => {
     api("/health")
       .then((h) => setDesktopMode(h.desktop === true))
@@ -468,7 +472,7 @@ export default function Studio() {
         <div role="status" className="status">
           {status ||
             (p?.scene.reference
-              ? "Planimetria importata · misure in millimetri · riconoscimento IA da integrare"
+              ? "Planimetria importata · riconoscimento automatico locale disponibile"
               : "Misure in millimetri · arredi di prova · nessun servizio IA esterno")}
         </div>
         {importing && (
@@ -478,6 +482,7 @@ export default function Studio() {
               if (p)
                 edit((q) => {
                   q.scene.reference = reference;
+                  delete q.scene.recognition;
                   q.scene.walls = [];
                   q.scene.openings = [];
                   q.scene.items = [];
@@ -505,6 +510,23 @@ export default function Studio() {
               setImporting(false);
               setStatus(
                 "Planimetria importata. Salva il progetto per conservarla.",
+              );
+            }}
+          />
+        )}
+        {recognizing && p?.scene.reference && (
+          <RecognizePlan
+            key={(p.id || "new") + p.scene.reference.sha256}
+            reference={p.scene.reference}
+            current={p.scene.recognition}
+            onClose={() => setRecognizing(false)}
+            onAccept={(result) => {
+              edit((q) => {
+                q.scene.recognition = result;
+              });
+              setRecognizing(false);
+              setStatus(
+                "Riconoscimento confermato. Salva il progetto per conservarlo.",
               );
             }}
           />
@@ -611,6 +633,13 @@ export default function Studio() {
                       >
                         Inquadra pianta
                       </button>
+                      {p.scene.reference && (
+                        <button onClick={() => setRecognizing(true)}>
+                          {p.scene.recognition
+                            ? "Rivedi muri e ambienti"
+                            : "Riconosci muri e ambienti"}
+                        </button>
+                      )}
                       <button onClick={exportPlan}>Esporta PNG</button>
                     </div>
                   </div>
@@ -661,6 +690,82 @@ export default function Studio() {
                             listening={false}
                           />
                         ))}
+                        {p.scene.recognition?.rooms.map((room) => (
+                          <Group key={room.id} listening={false}>
+                            <Line
+                              points={room.points.flatMap((p) => [
+                                p.x * S,
+                                p.y * S,
+                              ])}
+                              closed
+                              fill="#dfb979"
+                              opacity={0.2}
+                            />
+                            <Text
+                              x={
+                                (room.points.reduce((s, p) => s + p.x, 0) /
+                                  room.points.length) *
+                                S
+                              }
+                              y={
+                                (room.points.reduce((s, p) => s + p.y, 0) /
+                                  room.points.length) *
+                                S
+                              }
+                              text={
+                                room.name +
+                                " · " +
+                                roomArea(room).toFixed(2) +
+                                " m²"
+                              }
+                              fontSize={12}
+                              fill="#6d4324"
+                            />
+                          </Group>
+                        ))}
+                        {p.scene.recognition?.walls.map((w) => (
+                          <Line
+                            key={w.id}
+                            points={[
+                              w.start.x * S,
+                              w.start.y * S,
+                              w.end.x * S,
+                              w.end.y * S,
+                            ]}
+                            stroke="#2851a3"
+                            strokeWidth={w.thickness * S}
+                            opacity={0.65}
+                            listening={false}
+                          />
+                        ))}
+                        {p.scene.recognition?.openings.map((o) => {
+                          const a = p.scene.recognition!;
+                          const points = openingPoints(o, a.walls).map(
+                            (v) => v * S,
+                          );
+                          const w = a.walls.find((w) => w.id === o.wallId);
+                          return (
+                            <Group key={o.id} listening={false}>
+                              <Line
+                                points={points}
+                                stroke="white"
+                                strokeWidth={(w?.thickness || 200) * S + 2}
+                              />
+                              <Line
+                                points={points}
+                                stroke={
+                                  o.kind === "door"
+                                    ? "#287a42"
+                                    : o.kind === "window"
+                                      ? "#007f96"
+                                      : "#9b6600"
+                                }
+                                strokeWidth={4}
+                                strokeScaleEnabled={false}
+                              />
+                            </Group>
+                          );
+                        })}
                         <Line
                           points={p.scene.walls.flatMap((w) => [
                             w.x * S,
@@ -813,8 +918,23 @@ export default function Studio() {
                         {Math.round(p.scene.reference.height)} mm
                       </p>
                       <p>
-                        Base 2D importata. Il riconoscimento IA di muri e
-                        aperture sarà il prossimo passaggio.
+                        {p.scene.recognition
+                          ? `${p.scene.recognition.walls.length} muri · ${p.scene.recognition.openings.length} aperture · ${p.scene.recognition.rooms.length} ambienti. Controllati dall’operatore.`
+                          : "Base 2D importata. Usa Riconosci muri e ambienti per interpretare la geometria sul computer."}
+                      </p>
+                    </div>
+                  )}
+                  {p.scene.recognition && (
+                    <div className="recognized-summary">
+                      <h4>Ambienti controllati</h4>
+                      {p.scene.recognition.rooms.map((room) => (
+                        <p key={room.id}>
+                          {room.name} · {roomArea(room).toFixed(2)} m²
+                        </p>
+                      ))}
+                      <p className="hint">
+                        Per correggere muri, aperture e contorni usa Rivedi muri
+                        e ambienti.
                       </p>
                     </div>
                   )}
@@ -823,7 +943,9 @@ export default function Studio() {
                     impediscono il salvataggio.
                   </p>
                   <label>
-                    Altezza stanza
+                    {p.scene.reference
+                      ? "Altezza di progetto (da verificare)"
+                      : "Altezza stanza"}
                     <Num
                       value={p.scene.height}
                       onChange={(v) =>
@@ -833,88 +955,95 @@ export default function Studio() {
                       }
                     />
                   </label>
-                  <details>
-                    <summary>Muri e vertici ({p.scene.walls.length})</summary>
-                    {p.scene.walls.map((w, i) => (
-                      <div className="vertex" key={w.id}>
-                        <b>Muro {i + 1} · vertice iniziale</b>
-                        <div className="pair">
-                          <label>
-                            X
-                            <Num
-                              value={w.x}
-                              onChange={(v) =>
+                  {!p.scene.reference && (
+                    <>
+                      <details>
+                        <summary>
+                          Muri e vertici ({p.scene.walls.length})
+                        </summary>
+                        {p.scene.walls.map((w, i) => (
+                          <div className="vertex" key={w.id}>
+                            <b>Muro {i + 1} · vertice iniziale</b>
+                            <div className="pair">
+                              <label>
+                                X
+                                <Num
+                                  value={w.x}
+                                  onChange={(v) =>
+                                    edit((q) => {
+                                      q.scene.walls[i].x = v;
+                                    })
+                                  }
+                                />
+                              </label>
+                              <label>
+                                Y
+                                <Num
+                                  value={w.y}
+                                  onChange={(v) =>
+                                    edit((q) => {
+                                      q.scene.walls[i].y = v;
+                                    })
+                                  }
+                                />
+                              </label>
+                            </div>
+                            <button
+                              disabled={p.scene.walls.length <= 3}
+                              onClick={() =>
                                 edit((q) => {
-                                  q.scene.walls[i].x = v;
+                                  q.scene.walls.splice(i, 1);
                                 })
                               }
-                            />
-                          </label>
-                          <label>
-                            Y
-                            <Num
-                              value={w.y}
-                              onChange={(v) =>
-                                edit((q) => {
-                                  q.scene.walls[i].y = v;
-                                })
-                              }
-                            />
-                          </label>
-                        </div>
+                            >
+                              Rimuovi vertice
+                            </button>
+                          </div>
+                        ))}
                         <button
-                          disabled={p.scene.walls.length <= 3}
+                          disabled={p.scene.walls.length < 3}
                           onClick={() =>
                             edit((q) => {
-                              q.scene.walls.splice(i, 1);
+                              const a = q.scene.walls[0],
+                                b = q.scene.walls[1];
+                              q.scene.walls.splice(1, 0, {
+                                id: crypto.randomUUID(),
+                                x: (a.x + b.x) / 2,
+                                y: (a.y + b.y) / 2,
+                              });
                             })
                           }
                         >
-                          Rimuovi vertice
+                          ＋ Dividi primo muro
+                        </button>
+                      </details>
+                      <h4>Aperture</h4>
+                      <div className="pair">
+                        <button
+                          disabled={p.scene.walls.length < 3}
+                          onClick={() => addOpening("door")}
+                        >
+                          ＋ Porta
+                        </button>
+                        <button
+                          disabled={p.scene.walls.length < 3}
+                          onClick={() => addOpening("window")}
+                        >
+                          ＋ Finestra
                         </button>
                       </div>
-                    ))}
-                    <button
-                      disabled={p.scene.walls.length < 3}
-                      onClick={() =>
-                        edit((q) => {
-                          const a = q.scene.walls[0],
-                            b = q.scene.walls[1];
-                          q.scene.walls.splice(1, 0, {
-                            id: crypto.randomUUID(),
-                            x: (a.x + b.x) / 2,
-                            y: (a.y + b.y) / 2,
-                          });
-                        })
-                      }
-                    >
-                      ＋ Dividi primo muro
-                    </button>
-                  </details>
-                  <h4>Aperture</h4>
-                  <div className="pair">
-                    <button
-                      disabled={p.scene.walls.length < 3}
-                      onClick={() => addOpening("door")}
-                    >
-                      ＋ Porta
-                    </button>
-                    <button
-                      disabled={p.scene.walls.length < 3}
-                      onClick={() => addOpening("window")}
-                    >
-                      ＋ Finestra
-                    </button>
-                  </div>
-                  {p.scene.openings.map((o) => (
-                    <button
-                      className="object"
-                      key={o.id}
-                      onClick={() => setSelected(o.id)}
-                    >
-                      {o.kind === "door" ? "Porta" : "Finestra"} · {o.width} mm
-                    </button>
-                  ))}
+                      {p.scene.openings.map((o) => (
+                        <button
+                          className="object"
+                          key={o.id}
+                          onClick={() => setSelected(o.id)}
+                        >
+                          {o.kind === "door" ? "Porta" : "Finestra"} · {o.width}{" "}
+                          mm
+                        </button>
+                      ))}
+                    </>
+                  )}
                   <h4>Arredi di prova</h4>
                   <p className="hint">Volumi generici, senza marchio o SKU.</p>
                   {[
